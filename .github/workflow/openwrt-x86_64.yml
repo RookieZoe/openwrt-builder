@@ -4,7 +4,7 @@ on:
   # schedule:
   #   - cron: 0 2 28 * *
   label:
-    types: [created, deleted]
+    types: [deleted]
   # push:
   #   branches:
   #     - master
@@ -28,24 +28,12 @@ jobs:
 
       - name: Source code init
         env:
-          OPENWRT_REPO: https://github.com/openwrt/openwrt.git
-          OPENWRT_BRANCH: master
-          CLASH_REPO: https://github.com/frainzy1477/luci-app-clash.git
-          VLMCSD_REPO: https://github.com/awesome-openwrt/luci-app-vlmcsd.git
-          ZEROTIER_REPO: https://github.com/rufengsuixing/luci-app-zerotier.git
-          LEDE_REPO: https://github.com/coolsnowwolf/lede.git
+          OPENWRT_REPO: https://github.com/Lienol/openwrt.git
+          OPENWRT_BRANCH: dev-19.07
           CONFIG_REPO: https://github.com/RookieZoe/openwrt-builder.git
         run: |
           git clone $OPENWRT_REPO -b $OPENWRT_BRANCH openwrt
-          git clone $LEDE_REPO lede
-          git clone $CLASH_REPO luci-app-clash
-          git clone $VLMCSD_REPO luci-app-vlmcsd
-          git clone $ZEROTIER_REPO luci-app-zerotier
           git clone $CONFIG_REPO openwrt-builder
-          mv luci-app-zerotier ./openwrt/package/
-          mv luci-app-vlmcsd ./openwrt/package/
-          mv luci-app-clash ./openwrt/package/
-          mv lede/package/lean/vlmcsd ./openwrt/package/
           cat ./openwrt-builder/feeds.conf > ./openwrt/feeds.conf.default
 
       - name: Feeds init
