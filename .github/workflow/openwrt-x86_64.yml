@@ -1,0 +1,93 @@
+name: openwrt-x86_64
+
+on:
+  # schedule:
+  #   - cron: 0 2 28 * *
+  label:
+    types: [created, deleted]
+  # push:
+  #   branches:
+  #     - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Workspace init
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo rm -rf /usr/share/dotnet /etc/mysql /etc/php /etc/apt/sources.list.d
+          sudo -E apt-get -y purge azure-cli ghc* zulu* hhvm llvm* firefox google* dotnet* powershell openjdk* mysql* php*
+          sudo -E apt-get -qq update
+          sudo -E apt-get -qq install build-essential asciidoc binutils bzip2 gawk gettext git libncurses5-dev libz-dev patch python3.5 python2.7 unzip zlib1g-dev lib32gcc1 libc6-dev-i386 subversion flex uglifyjs git-core gcc-multilib p7zip p7zip-full msmtp libssl-dev texinfo libglib2.0-dev xmlto qemu-utils upx libelf-dev autoconf automake libtool autopoint device-tree-compiler g++-multilib antlr3 gperf
+          sudo ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+          sudo -E apt-get -y autoremove --purge
+          sudo -E apt-get clean
+
+      - name: Source code init
+        env:
+          OPENWRT_REPO: https://github.com/openwrt/openwrt.git
+          OPENWRT_BRANCH: master
+          CLASH_REPO: https://github.com/frainzy1477/luci-app-clash.git
+          VLMCSD_REPO: https://github.com/awesome-openwrt/luci-app-vlmcsd.git
+          ZEROTIER_REPO: https://github.com/rufengsuixing/luci-app-zerotier.git
+          LEDE_REPO: https://github.com/coolsnowwolf/lede.git
+          CONFIG_REPO: https://github.com/RookieZoe/openwrt-builder.git
+        run: |
+          git clone $OPENWRT_REPO -b $OPENWRT_BRANCH openwrt
+          git clone $LEDE_REPO lede
+          git clone $CLASH_REPO luci-app-clash
+          git clone $VLMCSD_REPO luci-app-vlmcsd
+          git clone $ZEROTIER_REPO luci-app-zerotier
+          git clone $CONFIG_REPO openwrt-builder
+          mv luci-app-zerotier ./openwrt/package/
+          mv luci-app-vlmcsd ./openwrt/package/
+          mv luci-app-clash ./openwrt/package/
+          mv lede/package/lean/vlmcsd ./openwrt/package/
+          cat ./openwrt-builder/feeds.conf > ./openwrt/feeds.conf.default
+
+      - name: Feeds init
+        run: cd openwrt && ./scripts/feeds update -a && ./scripts/feeds install -a
+
+      - name: Make defconfig
+        run: |
+          cd openwrt
+          rm -f .config
+          cp ../openwrt-builder/openwrt-x86_64.config ./.config
+          make defconfig
+
+      - name: Make download
+        run: |
+          cd openwrt
+          make download -j8
+          find dl -size -1024c -exec ls -l {} \;
+          find dl -size -1024c -exec rm -f {} \;
+
+      - name: Multi-thread compile
+        run: |
+          cd openwrt
+          make package/feeds/luci/luci-base/compile V=99
+          make package/lean/luci-app-ssr-plus/compile V=99
+          echo -e "$(nproc) thread build."
+          make -j$(nproc) V=s
+
+      - name: Single-thread compile
+        if: failure()
+        run: |
+          cd openwrt
+          make -j1 V=s
+
+      - name: Pack up targets
+        run: |
+          rm -rf ./targets/
+          mkdir -p ./targets/
+          # find openwrt/bin/targets/ -name "*sysupgrade*bin*" | xargs -i mv -f {} ./targets/
+          # find openwrt/bin/targets/ -name "*combined*img*" | xargs -i mv -f {} ./targets/
+
+      - name: Upload targets
+        uses: actions/upload-artifact@master
+        with:
+          name: openwrt-x86_64
+          path: ./targets/
