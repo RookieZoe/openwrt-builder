@@ -1,19 +1,30 @@
-name: openwrt-x86_64
+name: leinol-19.07-luci19.feeds
 
 on:
   # schedule:
   #   - cron: 0 2 28 * *
-  label:
-    types: [deleted]
-  # push:
-  #   branches:
-  #     - master
+  # label:
+  #   types: [created, deleted]
+  push:
+    branches:
+      - master
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
+      - name: Checkout configs
+        uses: actions/checkout@v2
+        with:
+          path: configs
+
+      - name: Checkout openwrt repo
+        uses: actions/checkout@v2
+        with:
+          repository: Lienol/openwrt
+          path: openwrt
+          ref: dev-19.07
+
       - name: Workspace init
         env:
           DEBIAN_FRONTEND: noninteractive
@@ -26,36 +37,28 @@ jobs:
           sudo -E apt-get -y autoremove --purge
           sudo -E apt-get clean
 
-      - name: Source code init
-        env:
-          OPENWRT_REPO: https://github.com/Lienol/openwrt.git
-          OPENWRT_BRANCH: dev-19.07
-          CONFIG_REPO: https://github.com/RookieZoe/openwrt-builder.git
-        run: |
-          git clone $OPENWRT_REPO -b $OPENWRT_BRANCH openwrt
-          git clone $CONFIG_REPO openwrt-builder
-          cat ./openwrt-builder/feeds.conf > ./openwrt/feeds.conf.default
-
       - name: Feeds init
-        run: cd openwrt && ./scripts/feeds update -a && ./scripts/feeds install -a
+        run: |
+          cat $GITHUB_WORKSPACE/configs/leinol-19.07-luci19.feeds > $GITHUB_WORKSPACE/openwrt/feeds.conf.default
+          cd $GITHUB_WORKSPACE/openwrt && ./scripts/feeds update -a && ./scripts/feeds install -a
 
       - name: Make defconfig
         run: |
-          cd openwrt
-          rm -f .config
-          cp ../openwrt-builder/openwrt-x86_64.config ./.config
+          rm -f $GITHUB_WORKSPACE/openwrt/.config
+          cp $GITHUB_WORKSPACE/configs/leinol-19.07-luci19.config $GITHUB_WORKSPACE/openwrt/.config
+          cd $GITHUB_WORKSPACE/openwrt/
           make defconfig
 
       - name: Make download
         run: |
-          cd openwrt
+          cd $GITHUB_WORKSPACE/openwrt/
           make download -j8
           find dl -size -1024c -exec ls -l {} \;
           find dl -size -1024c -exec rm -f {} \;
 
       - name: Multi-thread compile
         run: |
-          cd openwrt
+          cd $GITHUB_WORKSPACE/openwrt/
           make package/feeds/luci/luci-base/compile V=99
           make package/lean/luci-app-ssr-plus/compile V=99
           echo -e "$(nproc) thread build."
@@ -64,18 +67,19 @@ jobs:
       - name: Single-thread compile
         if: failure()
         run: |
-          cd openwrt
+          cd $GITHUB_WORKSPACE/openwrt/
           make -j1 V=s
 
       - name: Pack up targets
         run: |
-          rm -rf ./targets/
-          mkdir -p ./targets/
-          # find openwrt/bin/targets/ -name "*sysupgrade*bin*" | xargs -i mv -f {} ./targets/
-          # find openwrt/bin/targets/ -name "*combined*img*" | xargs -i mv -f {} ./targets/
+          rm -rf $GITHUB_WORKSPACE/targets/
+          mkdir -p $GITHUB_WORKSPACE/targets/
+          find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "*sysupgrade*bin*" | xargs -i mv -f {} $GITHUB_WORKSPACE/targets/
+          find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "*combined*" | xargs -i mv -f {} $GITHUB_WORKSPACE/targets/
+          find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "config.buildinfo" | xargs -i mv -f {} $GITHUB_WORKSPACE/targets/
 
       - name: Upload targets
         uses: actions/upload-artifact@master
         with:
           name: openwrt-x86_64
-          path: ./targets/
+          path: $GITHUB_WORKSPACE/targets/
