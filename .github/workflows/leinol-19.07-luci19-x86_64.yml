@@ -77,10 +77,11 @@ jobs:
           find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "*sysupgrade*bin*" | xargs -i mv -f {} $GITHUB_WORKSPACE/targets/
           find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "*combined*" | xargs -i mv -f {} $GITHUB_WORKSPACE/targets/
           find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "config.buildinfo" | xargs -i mv -f {} $GITHUB_WORKSPACE/targets/
+          ls -la $GITHUB_WORKSPACE/targets/
 
       - name: Upload targets
         if: success()
         uses: actions/upload-artifact@master
         with:
-          name: openwrt-x86_64
-          path: $GITHUB_WORKSPACE/targets/
+          name: leinol-19.07-luci19-x86_64
+          path: ${{ github.workspace }}/targets
