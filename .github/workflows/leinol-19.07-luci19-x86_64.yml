@@ -40,6 +40,7 @@ jobs:
       - name: Feeds init
         run: |
           cat $GITHUB_WORKSPACE/configs/leinol-19.07-luci19.feeds > $GITHUB_WORKSPACE/openwrt/feeds.conf.default
+          cat $GITHUB_WORKSPACE/openwrt/feeds.conf.default
           cd $GITHUB_WORKSPACE/openwrt && ./scripts/feeds update -a && ./scripts/feeds install -a
 
       - name: Make defconfig
@@ -59,8 +60,6 @@ jobs:
       - name: Multi-thread compile
         run: |
           cd $GITHUB_WORKSPACE/openwrt/
-          make package/feeds/luci/luci-base/compile V=99
-          make package/lean/luci-app-ssr-plus/compile V=99
           echo -e "$(nproc) thread build."
           make -j$(nproc) V=s
 
@@ -71,6 +70,7 @@ jobs:
           make -j1 V=s
 
       - name: Pack up targets
+        if: success()
         run: |
           rm -rf $GITHUB_WORKSPACE/targets/
           mkdir -p $GITHUB_WORKSPACE/targets/
@@ -79,6 +79,7 @@ jobs:
           find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "config.buildinfo" | xargs -i mv -f {} $GITHUB_WORKSPACE/targets/
 
       - name: Upload targets
+        if: success()
         uses: actions/upload-artifact@master
         with:
           name: openwrt-x86_64
