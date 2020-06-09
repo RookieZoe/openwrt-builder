@@ -1,0 +1,87 @@
+name: lienol-19.07-luci19-x86_64
+
+on:
+  # schedule:
+  #   - cron: 0 2 28 * *
+  # label:
+  #   types: [created, deleted]
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout configs
+        uses: actions/checkout@v2
+        with:
+          path: ${{ github.workspace }}/configs
+
+      - name: Checkout openwrt repo
+        uses: actions/checkout@v2
+        with:
+          repository: Lienol/openwrt
+          path: ${{ github.workspace }}/openwrt
+          ref: dev-19.07
+
+      - name: Workspace init
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo rm -rf /usr/share/dotnet /etc/mysql /etc/php /etc/apt/sources.list.d
+          sudo -E apt-get -y purge azure-cli ghc* zulu* hhvm llvm* firefox google* dotnet* powershell openjdk* mysql* php*
+          sudo -E apt-get -qq update
+          sudo -E apt-get -qq install build-essential asciidoc binutils bzip2 gawk gettext git libncurses5-dev libz-dev patch python3.5 python2.7 unzip zlib1g-dev lib32gcc1 libc6-dev-i386 subversion flex uglifyjs git-core gcc-multilib p7zip p7zip-full msmtp libssl-dev texinfo libglib2.0-dev xmlto qemu-utils upx libelf-dev autoconf automake libtool autopoint device-tree-compiler g++-multilib antlr3 gperf
+          sudo ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+          sudo -E apt-get -y autoremove --purge
+          sudo -E apt-get clean
+
+      - name: Feeds init
+        run: |
+          cat $GITHUB_WORKSPACE/configs/lienol-19.07-luci19.feeds > $GITHUB_WORKSPACE/openwrt/feeds.conf.default
+          cat $GITHUB_WORKSPACE/openwrt/feeds.conf.default
+          cd $GITHUB_WORKSPACE/openwrt && ./scripts/feeds update -a && ./scripts/feeds install -a
+
+      - name: Make defconfig
+        run: |
+          rm -f $GITHUB_WORKSPACE/openwrt/.config
+          cp $GITHUB_WORKSPACE/configs/lienol-19.07-luci19.config $GITHUB_WORKSPACE/openwrt/.config
+          cd $GITHUB_WORKSPACE/openwrt/
+          make defconfig
+
+      - name: Make download
+        run: |
+          cd $GITHUB_WORKSPACE/openwrt/
+          make download -j8
+          find dl -size -1024c -exec ls -l {} \;
+          find dl -size -1024c -exec rm -f {} \;
+
+      - name: Multi-thread compile
+        run: |
+          cd $GITHUB_WORKSPACE/openwrt/
+          echo -e "$(nproc) thread build."
+          make -j$(nproc) V=s
+
+      - name: Single-thread compile
+        if: failure()
+        run: |
+          cd $GITHUB_WORKSPACE/openwrt/
+          make -j1 V=s
+
+      - name: Pack up targets
+        if: success()
+        run: |
+          rm -rf $GITHUB_WORKSPACE/targets/
+          mkdir -p $GITHUB_WORKSPACE/targets/
+          find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "*sysupgrade*bin*" | xargs -i mv -f {} $GITHUB_WORKSPACE/targets/
+          find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "*combined*" | xargs -i mv -f {} $GITHUB_WORKSPACE/targets/
+          find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "config.buildinfo" | xargs -i mv -f {} $GITHUB_WORKSPACE/targets/
+          ls -la $GITHUB_WORKSPACE/targets/
+
+      - name: Upload targets
+        if: success()
+        uses: actions/upload-artifact@master
+        with:
+          name: lienol-19.07-luci19-x86_64
+          path: ${{ github.workspace }}/targets

@@ -1,4 +1,4 @@
-name: leinol-19.07-luci19.feeds
+name: lienol-19.07-op-luci19-x86_64
 
 on:
   # schedule:
@@ -16,13 +16,13 @@ jobs:
       - name: Checkout configs
         uses: actions/checkout@v2
         with:
-          path: configs
+          path: ${{ github.workspace }}/configs
 
       - name: Checkout openwrt repo
         uses: actions/checkout@v2
         with:
           repository: Lienol/openwrt
-          path: openwrt
+          path: ${{ github.workspace }}/openwrt
           ref: dev-19.07
 
       - name: Workspace init
@@ -39,14 +39,16 @@ jobs:
 
       - name: Feeds init
         run: |
-          cat $GITHUB_WORKSPACE/configs/leinol-19.07-luci19.feeds > $GITHUB_WORKSPACE/openwrt/feeds.conf.default
+          cat $GITHUB_WORKSPACE/configs/lienol-19.07-op-luci19.feeds > $GITHUB_WORKSPACE/openwrt/feeds.conf.default
           cat $GITHUB_WORKSPACE/openwrt/feeds.conf.default
-          cd $GITHUB_WORKSPACE/openwrt && ./scripts/feeds update -a && ./scripts/feeds install -a
+          cd $GITHUB_WORKSPACE/openwrt
+          git clone https://github.com/kuoruan/openwrt-kcptun.git package/kcptun
+          ./scripts/feeds update -a && ./scripts/feeds install -a
 
       - name: Make defconfig
         run: |
           rm -f $GITHUB_WORKSPACE/openwrt/.config
-          cp $GITHUB_WORKSPACE/configs/leinol-19.07-luci19.config $GITHUB_WORKSPACE/openwrt/.config
+          cp $GITHUB_WORKSPACE/configs/lienol-19.07-op-luci19.config $GITHUB_WORKSPACE/openwrt/.config
           cd $GITHUB_WORKSPACE/openwrt/
           make defconfig
 
@@ -83,5 +85,5 @@ jobs:
         if: success()
         uses: actions/upload-artifact@master
         with:
-          name: leinol-19.07-luci19-x86_64
+          name: lienol-19.07-op-luci19-x86_64
           path: ${{ github.workspace }}/targets
