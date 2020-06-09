@@ -13,6 +13,7 @@ Feeds: [lienol-19.07-luci19.feeds](./lienol-19.07-luci19.feeds)
 
 - luci-app-adbyby-plus
 - luci-app-adguardhome
+- luci-app-arpbind
 - luci-app-fileassistant
 - luci-app-filetransfer
 - luci-app-firewall
