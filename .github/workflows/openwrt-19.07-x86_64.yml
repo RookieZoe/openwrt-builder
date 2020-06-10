@@ -1,13 +1,13 @@
-name: lienol-19.07-luci19-x86_64
+name: openwrt-19.07-x86_64
 
 on:
-  # schedule:
-  #   - cron: 0 2 28 * *
-  # label:
-  #   types: [created, deleted]
+  schedule:
+    - cron: 0 2 28 * *
   push:
     branches:
       - master
+env:
+  TZ: Asia/Shanghai
 
 jobs:
   build:
@@ -29,24 +29,23 @@ jobs:
         env:
           DEBIAN_FRONTEND: noninteractive
         run: |
-          sudo rm -rf /usr/share/dotnet /etc/mysql /etc/php /etc/apt/sources.list.d
+          sudo rm -rf /usr/share/dotnet /etc/mysql /etc/php /etc/apt/sources.list.d /usr/local/lib/android /usr/lib/jvm /opt/ghc
           sudo -E apt-get -y purge azure-cli ghc* zulu* hhvm llvm* firefox google* dotnet* powershell openjdk* mysql* php*
           sudo -E apt-get -qq update
           sudo -E apt-get -qq install build-essential asciidoc binutils bzip2 gawk gettext git libncurses5-dev libz-dev patch python3.5 python2.7 unzip zlib1g-dev lib32gcc1 libc6-dev-i386 subversion flex uglifyjs git-core gcc-multilib p7zip p7zip-full msmtp libssl-dev texinfo libglib2.0-dev xmlto qemu-utils upx libelf-dev autoconf automake libtool autopoint device-tree-compiler g++-multilib antlr3 gperf
-          sudo ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
           sudo -E apt-get -y autoremove --purge
           sudo -E apt-get clean
 
       - name: Feeds init
         run: |
-          cat $GITHUB_WORKSPACE/configs/lienol-19.07-luci19.feeds > $GITHUB_WORKSPACE/openwrt/feeds.conf.default
+          cat $GITHUB_WORKSPACE/configs/openwrt-19.07.feeds > $GITHUB_WORKSPACE/openwrt/feeds.conf.default
           cat $GITHUB_WORKSPACE/openwrt/feeds.conf.default
           cd $GITHUB_WORKSPACE/openwrt && ./scripts/feeds update -a && ./scripts/feeds install -a
 
       - name: Make defconfig
         run: |
           rm -f $GITHUB_WORKSPACE/openwrt/.config
-          cp $GITHUB_WORKSPACE/configs/lienol-19.07-luci19.config $GITHUB_WORKSPACE/openwrt/.config
+          cp $GITHUB_WORKSPACE/configs/openwrt-19.07-x86_64.config $GITHUB_WORKSPACE/openwrt/.config
           cd $GITHUB_WORKSPACE/openwrt/
           make defconfig
 
@@ -83,5 +82,5 @@ jobs:
         if: success()
         uses: actions/upload-artifact@master
         with:
-          name: lienol-19.07-luci19-x86_64
+          name: openwrt-19.07-x86_64
           path: ${{ github.workspace }}/targets
