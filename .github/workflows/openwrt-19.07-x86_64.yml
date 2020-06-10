@@ -2,7 +2,7 @@ name: openwrt-19.07-x86_64
 
 on:
   schedule:
-    - cron: 0 2 28 * *
+    - cron: 0 2 1 */2 *
   push:
     branches:
       - master
