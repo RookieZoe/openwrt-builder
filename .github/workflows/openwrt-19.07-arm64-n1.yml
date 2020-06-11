@@ -82,10 +82,10 @@ jobs:
         run: |
           find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "*rootfs.tar.gz" | xargs -i mv -f {} $GITHUB_WORKSPACE/mknop/openwrt/
           cd $GITHUB_WORKSPACE/mknop/
-          ls -la ./
           sudo ./make -d -s 512 -k 5.4.43
           cd $GITHUB_WORKSPACE/mknop/out
-          tar -zcvf openwrt-firmware-n1.tar.gz ./*.img
+          tar -zcvf openwrt-firmware-n1.tar.gz ./*
+          ls -la ./
 
       - name: Upload targets
         if: success()
