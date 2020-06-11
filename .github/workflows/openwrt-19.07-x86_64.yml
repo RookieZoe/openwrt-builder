@@ -3,9 +3,7 @@ name: openwrt-19.07-x86_64
 on:
   schedule:
     - cron: 0 2 1 */2 *
-  push:
-    branches:
-      - master
+
 env:
   TZ: Asia/Shanghai
 
@@ -75,14 +73,11 @@ jobs:
           mkdir -p $GITHUB_WORKSPACE/targets/
           find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "*sysupgrade*bin*" | xargs -i mv -f {} $GITHUB_WORKSPACE/targets/
           find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "*combined*" | xargs -i mv -f {} $GITHUB_WORKSPACE/targets/
-          find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "config.buildinfo" | xargs -i mv -f {} $GITHUB_WORKSPACE/targets/
           ls -la $GITHUB_WORKSPACE/targets/
-          cd $GITHUB_WORKSPACE/targets/
-          tar -zcvf openwrt-x86_64.tar.gz ./*
 
       - name: Upload targets
         if: success()
         uses: actions/upload-artifact@master
         with:
           name: openwrt-19.07-x86_64
-          path: ${{ github.workspace }}/targets/openwrt-x86_64.tar.gz
+          path: ${{ github.workspace }}/targets
