@@ -1,4 +1,4 @@
-name: openwrt-19.07-x86_64
+name: openwrt-19.07-arm64-n1
 
 on:
   schedule:
@@ -25,6 +25,12 @@ jobs:
           path: ${{ github.workspace }}/openwrt
           ref: dev-19.07
 
+      - name: Checkout n1 maker repo
+        uses: actions/checkout@v2
+        with:
+          repository: tuanqing/mknop
+          path: ${{ github.workspace }}/mknop
+
       - name: Workspace init
         env:
           DEBIAN_FRONTEND: noninteractive
@@ -40,12 +46,15 @@ jobs:
         run: |
           cat $GITHUB_WORKSPACE/configs/openwrt-19.07.feeds > $GITHUB_WORKSPACE/openwrt/feeds.conf.default
           cat $GITHUB_WORKSPACE/openwrt/feeds.conf.default
-          cd $GITHUB_WORKSPACE/openwrt && ./scripts/feeds update -a && ./scripts/feeds install -a
+          cd $GITHUB_WORKSPACE/openwrt
+          svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/parted package/parted
+          git clone https://github.com/tuanqing/install-program package/install-program
+          ./scripts/feeds update -a && ./scripts/feeds install -a
 
       - name: Make defconfig
         run: |
           rm -f $GITHUB_WORKSPACE/openwrt/.config
-          cp $GITHUB_WORKSPACE/configs/openwrt-19.07-x86_64.config $GITHUB_WORKSPACE/openwrt/.config
+          cp $GITHUB_WORKSPACE/configs/openwrt-19.07-arm64-n1.config $GITHUB_WORKSPACE/openwrt/.config
           cd $GITHUB_WORKSPACE/openwrt/
           make defconfig
 
@@ -68,21 +77,19 @@ jobs:
           cd $GITHUB_WORKSPACE/openwrt/
           make -j1 V=s
 
-      - name: Pack up targets
+      - name: Make n1 firmware
         if: success()
         run: |
-          rm -rf $GITHUB_WORKSPACE/targets/
-          mkdir -p $GITHUB_WORKSPACE/targets/
-          find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "*sysupgrade*bin*" | xargs -i mv -f {} $GITHUB_WORKSPACE/targets/
-          find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "*combined*" | xargs -i mv -f {} $GITHUB_WORKSPACE/targets/
-          find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "config.buildinfo" | xargs -i mv -f {} $GITHUB_WORKSPACE/targets/
-          ls -la $GITHUB_WORKSPACE/targets/
-          cd $GITHUB_WORKSPACE/targets/
-          tar -zcvf openwrt-x86_64.tar.gz ./*
+          find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "*rootfs.tar.gz" | xargs -i mv -f {} $GITHUB_WORKSPACE/mknop/openwrt/
+          cd $GITHUB_WORKSPACE/mknop/
+          ls -la ./
+          sudo ./make -d -s 512 -k 5.4.43
+          cd $GITHUB_WORKSPACE/mknop/out
+          tar -zcvf openwrt-firmware-n1.tar.gz ./*.img
 
       - name: Upload targets
         if: success()
         uses: actions/upload-artifact@master
         with:
-          name: openwrt-19.07-x86_64
-          path: ${{ github.workspace }}/targets/openwrt-x86_64.tar.gz
+          name: openwrt-19.07-arm64-n1
+          path: ${{ github.workspace }}/mknop/out/openwrt-firmware-n1.tar.gz
