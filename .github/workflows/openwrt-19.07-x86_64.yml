@@ -38,11 +38,12 @@ jobs:
         run: |
           cat $GITHUB_WORKSPACE/configs/openwrt-19.07.feeds > $GITHUB_WORKSPACE/openwrt/feeds.conf.default
           cat $GITHUB_WORKSPACE/openwrt/feeds.conf.default
-          cd $GITHUB_WORKSPACE/openwrt && ./scripts/feeds update -a && ./scripts/feeds install -a
+          cd $GITHUB_WORKSPACE/openwrt && ./scripts/feeds update -a
           cat >> $GITHUB_WORKSPACE/openwrt/feeds/luci/themes/luci-theme-bootstrap/htdocs/luci-static/bootstrap/cascade.css << EOF
           #cbi-passwall-acl_rule .cbi-dropdown:not(.btn):not(.cbi-button),#cbi-passwall-acl_rule .cbi-dynlist{min-width:unset;}
           #list-content table{width:100%;}#list-content table tr td{height:30px;line-height:30px;}
           EOF
+          ./scripts/feeds install -a
 
       - name: Make defconfig
         run: |
@@ -54,7 +55,7 @@ jobs:
       - name: Make download
         run: |
           cd $GITHUB_WORKSPACE/openwrt/
-          make download -j8
+          make download -j$(nproc)
           find dl -size -1024c -exec ls -l {} \;
           find dl -size -1024c -exec rm -f {} \;
 
