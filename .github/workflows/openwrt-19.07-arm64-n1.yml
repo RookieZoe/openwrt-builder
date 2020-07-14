@@ -85,14 +85,15 @@ jobs:
         run: |
           find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "*rootfs.tar.gz" | xargs -i mv -f {} $GITHUB_WORKSPACE/mknop/openwrt/
           cd $GITHUB_WORKSPACE/mknop/
-          sudo ./make -d -s 512 -k 5.4.43
+          sudo ./make -d -s 512 -k latest
           cd $GITHUB_WORKSPACE/mknop/out
-          tar -zcvf openwrt-firmware-n1.tar.gz ./*
+          gzip $(find ./ -name *.img)
+          mv $(find ./ -name *.img.gz) ./openwrt-firmware-phicomm-n1.img.gz
           ls -la ./
 
       - name: Upload targets
         if: success()
         uses: actions/upload-artifact@master
         with:
-          name: openwrt-19.07-arm64-n1
-          path: ${{ github.workspace }}/mknop/out/openwrt-firmware-n1.tar.gz
+          name: openwrt-19.07-arm64-phicomm-n1
+          path: ${{ github.workspace }}/mknop/out/openwrt-firmware-phicomm-n1.img.gz
