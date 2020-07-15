@@ -12,12 +12,11 @@ Feeds: [openwrt-19.07.feeds](./openwrt-19.07.feeds)
 ### luci app list
 
 - luci-app-adbyby-plus
-- luci-app-adguardhome
 - luci-app-arpbind
 - luci-app-fileassistant
-- luci-app-filetransfer
 - luci-app-firewall
 - luci-app-flowoffload
+- luci-app-netdata
 - luci-app-opkg
 - luci-app-passwall
 - luci-app-ramfree
