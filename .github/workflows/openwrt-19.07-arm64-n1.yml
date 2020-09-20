@@ -1,6 +1,9 @@
 name: openwrt-19.07-arm64-n1
 
 on:
+  push:
+    branches:
+      - master
   schedule:
     - cron: '0 0 5/15 * *'
 
@@ -47,8 +50,8 @@ jobs:
           cd $GITHUB_WORKSPACE/openwrt
           svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/parted package/parted
           git clone https://github.com/tuanqing/install-program package/install-program
-          sed -i -e "s/DISTRIB_REVISION='19.07-SNAPSHOT'/DISTRIB_REVISION='$(date +"R%y.%m.%d")'/" $GITHUB_WORKSPACE/openwrt/package/default-settings/files/zzz-default-settings
-          sed -i -e "s/DISTRIB_DESCRIPTION='OpenWrt '/DISTRIB_DESCRIPTION='Potato '/" $GITHUB_WORKSPACE/openwrt/package/default-settings/files/zzz-default-settings
+          sed -i -e '/exit 0/d' $GITHUB_WORKSPACE/openwrt/package/default-settings/files/zzz-default-settings
+          cat $GITHUB_WORKSPACE/configs/zzz-default-settings.append >> $GITHUB_WORKSPACE/openwrt/package/default-settings/files/zzz-default-settings
           ./scripts/feeds update -a
           cat >> $GITHUB_WORKSPACE/openwrt/feeds/luci/themes/luci-theme-bootstrap/htdocs/luci-static/bootstrap/cascade.css << EOF
           #cbi-passwall-acl_rule .cbi-dropdown:not(.btn):not(.cbi-button),#cbi-passwall-acl_rule .cbi-dynlist{min-width:unset;}
