@@ -24,8 +24,8 @@ sed -i '/DISTRIB_REVISION=/d' /etc/openwrt_release
 sed -i '/DISTRIB_DESCRIPTION=/d' /etc/openwrt_release
 echo "DISTRIB_ID='$R_NAME'" >> /etc/openwrt_release
 echo "DISTRIB_RELEASE='$R_RELEASE'" >> /etc/openwrt_release
-echo "DISTRIB_REVISION='$R_REVISION'" >> /etc/openwrt_release
-echo "DISTRIB_DESCRIPTION='$R_NAME $R_RELEASE $R_REVISION_L'" >> /etc/openwrt_release
+echo "DISTRIB_REVISION='$R_REVISION_L'" >> /etc/openwrt_release
+echo "DISTRIB_DESCRIPTION='$R_NAME $R_RELEASE'" >> /etc/openwrt_release
 
 echo "$R_REVISION_L" > /etc/openwrt_version
 
