@@ -1,9 +1,6 @@
 name: openwrt-19.07-x86_64
 
 on:
-  push:
-    branches: 
-      - master
   schedule:
     - cron: '0 0 5/15 * *'
 
