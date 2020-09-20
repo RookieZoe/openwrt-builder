@@ -13,7 +13,7 @@ Feeds: [openwrt-19.07.feeds](./openwrt-19.07.feeds)
 
 x86_64: [openwrt-19.07-x86_64.config](./openwrt-19.07-x86_64.config)
 
-x86_64: [openwrt-19.07-arm64-n1.config](./openwrt-19.07-arm64-n1.config)
+arm64-n1: [openwrt-19.07-arm64-n1.config](./openwrt-19.07-arm64-n1.config)
 
 n1 img maker: [tuanqing/mknop](https://github.com/tuanqing/mknop)
 
