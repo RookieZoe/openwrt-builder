@@ -21,7 +21,6 @@ n1 img maker: [tuanqing/mknop](https://github.com/tuanqing/mknop)
 
 - luci-app-adbyby-plus
 - luci-app-arpbind
-- luci-app-dockerman
 - luci-app-fileassistant
 - luci-app-firewall
 - luci-app-flowoffload (sfe in x86)
