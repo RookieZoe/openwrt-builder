@@ -3,6 +3,8 @@ name: openwrt-19.07-x86_64
 on:
   schedule:
     - cron: '0 0 5/15 * *'
+  repository_dispatch:
+    types: 'run-x86'
 
 env:
   TZ: Asia/Shanghai
@@ -30,7 +32,7 @@ jobs:
           sudo rm -rf /usr/share/dotnet /etc/mysql /etc/php /etc/apt/sources.list.d /usr/local/lib/android /usr/lib/jvm /opt/ghc
           sudo -E apt-get -y purge azure-cli ghc* zulu* hhvm llvm* firefox google* dotnet* powershell openjdk* mysql* php*
           sudo -E apt-get -qq update
-          sudo -E apt-get -qq install build-essential asciidoc binutils bzip2 gawk gettext git libncurses5-dev libz-dev patch python3.5 python2.7 unzip zlib1g-dev lib32gcc1 libc6-dev-i386 subversion flex uglifyjs git-core gcc-multilib p7zip p7zip-full msmtp libssl-dev texinfo libglib2.0-dev xmlto qemu-utils upx libelf-dev autoconf automake libtool autopoint device-tree-compiler g++-multilib antlr3 gperf
+          sudo -E apt-get -qq install build-essential asciidoc binutils bzip2 gawk gettext git libncurses5-dev libz-dev patch python3.5 python2.7 unzip zlib1g-dev lib32gcc1 libc6-dev-i386 subversion flex uglifyjs git-core gcc-multilib p7zip p7zip-full msmtp libssl-dev texinfo libglib2.0-dev xmlto qemu-utils upx libelf-dev autoconf automake libtool autopoint device-tree-compiler g++-multilib antlr3 gperf tree
           sudo -E apt-get -y autoremove --purge
           sudo -E apt-get clean
 
@@ -78,14 +80,22 @@ jobs:
         if: success()
         run: |
           rm -rf $GITHUB_WORKSPACE/targets/
-          mkdir -p $GITHUB_WORKSPACE/targets/
-          find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "*sysupgrade*bin*" | xargs -i mv -f {} $GITHUB_WORKSPACE/targets/
-          find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "*combined*" | xargs -i mv -f {} $GITHUB_WORKSPACE/targets/
-          ls -la $GITHUB_WORKSPACE/targets/
+          mkdir -p $GITHUB_WORKSPACE/targets/img/
+          mkdir -p $GITHUB_WORKSPACE/targets/vmdk/
+          find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "*combined-squashfs*.img.gz" | xargs -i mv -f {} $GITHUB_WORKSPACE/targets/img/
+          find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "*combined-squashfs*.vmdk" | xargs -i mv -f {} $GITHUB_WORKSPACE/targets/vmdk/
+          tree $GITHUB_WORKSPACE/targets/
 
-      - name: Upload targets
+      - name: Upload targets [img.gz]
         if: success()
-        uses: actions/upload-artifact@master
+        uses: actions/upload-artifact@main
         with:
-          name: openwrt-19.07-x86_64
-          path: ${{ github.workspace }}/targets
+          name: openwrt-19.07-x86_64.img.gz
+          path: ${{ github.workspace }}/targets/img
+
+      - name: Upload targets [vmdk]
+        if: success()
+        uses: actions/upload-artifact@main
+        with:
+          name: openwrt-19.07-x86_64.vmdk
+          path: ${{ github.workspace }}/targets/vmdk

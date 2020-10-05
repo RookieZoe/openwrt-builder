@@ -1,8 +1,10 @@
-name: openwrt-19.07-arm64-n1
+name: openwrt-19.07-arm64
 
 on:
   schedule:
     - cron: '0 0 5/15 * *'
+  repository_dispatch:
+    types: 'run-arm64'
 
 env:
   TZ: Asia/Shanghai
@@ -36,7 +38,7 @@ jobs:
           sudo rm -rf /usr/share/dotnet /etc/mysql /etc/php /etc/apt/sources.list.d /usr/local/lib/android /usr/lib/jvm /opt/ghc
           sudo -E apt-get -y purge azure-cli ghc* zulu* hhvm llvm* firefox google* dotnet* powershell openjdk* mysql* php*
           sudo -E apt-get -qq update
-          sudo -E apt-get -qq install build-essential asciidoc binutils bzip2 gawk gettext git libncurses5-dev libz-dev patch python3.5 python2.7 unzip zlib1g-dev lib32gcc1 libc6-dev-i386 subversion flex uglifyjs git-core gcc-multilib p7zip p7zip-full msmtp libssl-dev texinfo libglib2.0-dev xmlto qemu-utils upx libelf-dev autoconf automake libtool autopoint device-tree-compiler g++-multilib antlr3 gperf
+          sudo -E apt-get -qq install build-essential asciidoc binutils bzip2 gawk gettext git libncurses5-dev libz-dev patch python3.5 python2.7 unzip zlib1g-dev lib32gcc1 libc6-dev-i386 subversion flex uglifyjs git-core gcc-multilib p7zip p7zip-full msmtp libssl-dev texinfo libglib2.0-dev xmlto qemu-utils upx libelf-dev autoconf automake libtool autopoint device-tree-compiler g++-multilib antlr3 gperf tree
           sudo -E apt-get -y autoremove --purge
           sudo -E apt-get clean
 
@@ -59,7 +61,7 @@ jobs:
       - name: Make defconfig
         run: |
           rm -f $GITHUB_WORKSPACE/openwrt/.config
-          cp $GITHUB_WORKSPACE/configs/openwrt-19.07-arm64-n1.config $GITHUB_WORKSPACE/openwrt/.config
+          cp $GITHUB_WORKSPACE/configs/openwrt-19.07-arm64.config $GITHUB_WORKSPACE/openwrt/.config
           cd $GITHUB_WORKSPACE/openwrt/
           make defconfig
 
@@ -82,20 +84,64 @@ jobs:
           cd $GITHUB_WORKSPACE/openwrt/
           make -j1 V=s
 
-      - name: Make n1 firmware
+      - name: Pack up targets
         if: success()
         run: |
-          find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "*rootfs.tar.gz" | xargs -i mv -f {} $GITHUB_WORKSPACE/mknop/openwrt/
-          cd $GITHUB_WORKSPACE/mknop/
-          sudo ./make -d -s 512 -k latest
-          cd $GITHUB_WORKSPACE/mknop/out
-          gzip $(find ./ -name '*.img')
-          mv $(find ./ -name '*.img.gz') ./openwrt-firmware-phicomm-n1.img.gz
-          ls -la ./
+          rm -rf $GITHUB_WORKSPACE/targets/
+          mkdir -p $GITHUB_WORKSPACE/targets/rootfs
+          find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "*rootfs.tar.gz" | xargs -i cp -f {} $GITHUB_WORKSPACE/targets/rootfs
+          tree $GITHUB_WORKSPACE/targets/
 
-      - name: Upload targets
+      - name: Upload targets [rootfs]
         if: success()
-        uses: actions/upload-artifact@master
+        uses: actions/upload-artifact@main
         with:
-          name: openwrt-19.07-arm64-phicomm-n1
-          path: ${{ github.workspace }}/mknop/out/openwrt-firmware-phicomm-n1.img.gz
+          name: openwrt-19.07-aarch64-rootfs.tar.gz
+          path: ${{ github.workspace }}/targets/rootfs
+
+      - name: Make multi firmwares
+        if: success()
+        run: |
+          find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "*rootfs.tar.gz" | xargs -i cp -f {} $GITHUB_WORKSPACE/mknop/openwrt/
+          cd $GITHUB_WORKSPACE/mknop/
+          sudo ./gen_openwrt -d -s 512 -k latest
+
+          devices=("phicomm-n1" "vplus" "beikeyun" "l1pro" "s905x3")
+          cd out
+          for x in ${devices[*]}; do
+            cd $x
+            filename=$(ls | awk -F '.img' '{print $1}')
+            gzip *.img
+            cd ../
+            echo "::set-env name=firmware_$x::$filename"
+          done
+
+      - name: Upload firmware [phicomm n1]
+        uses: actions/upload-artifact@main
+        with:
+          name: ${{ env.firmware_phicomm-n1 }}
+          path: out/phicomm-n1
+
+      - name: Upload firmware [vplus]
+        uses: actions/upload-artifact@main
+        with:
+          name: ${{ env.firmware_vplus }}
+          path: out/vplus
+
+      - name: Upload firmware [beikeyun]
+        uses: actions/upload-artifact@main
+        with:
+          name: ${{ env.firmware_beikeyun }}
+          path: out/beikeyun
+
+      - name: Upload firmware [l1pro]
+        uses: actions/upload-artifact@main
+        with:
+          name: ${{ env.firmware_l1pro }}
+          path: out/l1pro
+
+      - name: Upload firmware [s905x3]
+        uses: actions/upload-artifact@main
+        with:
+          name: ${{ env.firmware_s905x3 }}
+          path: out/s905x3

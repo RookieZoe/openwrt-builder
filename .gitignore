@@ -7,6 +7,8 @@
 
 openwrt
 
+build-n1.bash
+
 # local env files
 *env*
 
