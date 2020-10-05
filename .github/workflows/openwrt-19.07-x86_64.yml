@@ -42,8 +42,6 @@ jobs:
           cat $GITHUB_WORKSPACE/configs/openwrt-19.07.feeds > $GITHUB_WORKSPACE/openwrt/feeds.conf.default
           cat $GITHUB_WORKSPACE/openwrt/feeds.conf.default
           cd $GITHUB_WORKSPACE/openwrt
-          sed -i -e '/exit 0/d' $GITHUB_WORKSPACE/openwrt/package/default-settings/files/zzz-default-settings
-          cat $GITHUB_WORKSPACE/configs/zzz-default-settings.append >> $GITHUB_WORKSPACE/openwrt/package/default-settings/files/zzz-default-settings
           ./scripts/feeds update -a
           cat >> $GITHUB_WORKSPACE/openwrt/feeds/luci/themes/luci-theme-bootstrap/htdocs/luci-static/bootstrap/cascade.css << EOF
           #cbi-passwall-acl_rule .cbi-dropdown:not(.btn):not(.cbi-button),#cbi-passwall-acl_rule .cbi-dynlist{min-width:unset;}
