@@ -121,28 +121,28 @@ jobs:
         uses: actions/upload-artifact@main
         with:
           name: ${{ env.firmware_phicomm-n1 }}
-          path: out/phicomm-n1
+          path: ${{ github.workspace }}/mknop/out/phicomm-n1
 
       - name: Upload firmware [vplus]
         uses: actions/upload-artifact@main
         with:
           name: ${{ env.firmware_vplus }}
-          path: out/vplus
+          path: ${{ github.workspace }}/mknop/out/vplus
 
       - name: Upload firmware [beikeyun]
         uses: actions/upload-artifact@main
         with:
           name: ${{ env.firmware_beikeyun }}
-          path: out/beikeyun
+          path: ${{ github.workspace }}/mknop/out/beikeyun
 
       - name: Upload firmware [l1pro]
         uses: actions/upload-artifact@main
         with:
           name: ${{ env.firmware_l1pro }}
-          path: out/l1pro
+          path: ${{ github.workspace }}/mknop/out/l1pro
 
       - name: Upload firmware [s905x3]
         uses: actions/upload-artifact@main
         with:
           name: ${{ env.firmware_s905x3 }}
-          path: out/s905x3
+          path: ${{ github.workspace }}/mknop/out/s905x3
