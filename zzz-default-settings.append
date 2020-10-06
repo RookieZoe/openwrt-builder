@@ -1,0 +1,38 @@
+#自定义发行信息
+R_NAME="OpenWrt"
+R_NAME_L="openwrt"
+R_RELEASE="19.07-SNAPSHOT"
+R_RELEASE_L="19.07-snapshot"
+R_REVISION="$(date +"R%y.%m.%d")"
+R_REVISION_L="$(date +"r%y.%m.%d")"
+
+sed -i '/NAME=/d' /usr/lib/os-release
+sed -i '/VERSION=/d' /usr/lib/os-release
+sed -i '/VERSION_ID=/d' /usr/lib/os-release
+sed -i '/BUILD_ID=/d' /usr/lib/os-release
+sed -i '/OPENWRT_RELEASE=/d' /usr/lib/os-release
+echo "NAME=\"$R_NAME\"" >> /usr/lib/os-release
+echo "PRETTY_NAME=\"$R_NAME $R_RELEASE\"" >> /usr/lib/os-release
+echo "VERSION=\"$R_RELEASE\"" >> /usr/lib/os-release
+echo "VERSION_ID=\"$R_RELEASE_L\"" >> /usr/lib/os-release
+echo "BUILD_ID=\"$R_REVISION_L\"" >> /usr/lib/os-release
+echo "OPENWRT_RELEASE=\"$R_NAME $R_RELEASE $R_REVISION_L\"" >> /usr/lib/os-release
+
+sed -i '/DISTRIB_ID=/d' /etc/openwrt_release
+sed -i '/DISTRIB_RELEASE=/d' /etc/openwrt_release
+sed -i '/DISTRIB_REVISION=/d' /etc/openwrt_release
+sed -i '/DISTRIB_DESCRIPTION=/d' /etc/openwrt_release
+echo "DISTRIB_ID='$R_NAME'" >> /etc/openwrt_release
+echo "DISTRIB_RELEASE='$R_RELEASE'" >> /etc/openwrt_release
+echo "DISTRIB_REVISION='$R_REVISION_L'" >> /etc/openwrt_release
+echo "DISTRIB_DESCRIPTION='$R_NAME $R_RELEASE'" >> /etc/openwrt_release
+
+echo "$R_REVISION_L" > /etc/openwrt_version
+
+sed -i '/-----------------------------------------------------/d' /etc/banner
+sed -i '/OpenWrt/d' /etc/banner
+echo " -----------------------------------------------------" >> /etc/banner
+echo " $R_NAME $R_RELEASE, $R_REVISION_L" >> /etc/banner
+echo " -----------------------------------------------------" >> /etc/banner
+
+exit 0
