@@ -11,7 +11,7 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     if: github.event_name == 'schedule' || github.event.action == 'run-arm64'
     steps:
       - name: Checkout configs
