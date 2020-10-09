@@ -14,6 +14,12 @@ jobs:
     runs-on: ubuntu-18.04
     if: github.event_name == 'schedule' || github.event.action == 'run-arm64'
     steps:
+      - name: Checkout mknop
+        uses: actions/checkout@v2
+        with:
+          repository: RookieZoe/mknop
+          path: ${{ github.workspace }}/mknop
+
       - name: Workspace init
         env:
           DEBIAN_FRONTEND: noninteractive
@@ -22,7 +28,6 @@ jobs:
           sudo -E apt-get -y install build-essential asciidoc binutils bzip2 curl gawk gettext git libncurses5-dev libz-dev patch python3.5 python2.7 unzip zlib1g-dev lib32gcc1 libc6-dev-i386 subversion flex uglifyjs git-core gcc-multilib p7zip p7zip-full msmtp libssl-dev texinfo libglib2.0-dev xmlto qemu-utils upx libelf-dev autoconf automake libtool autopoint device-tree-compiler g++-multilib antlr3 gperf tree
           git clone https://github.com/RookieZoe/openwrt-builder.git $GITHUB_WORKSPACE/configs
           git clone https://github.com/Lienol/openwrt.git $GITHUB_WORKSPACE/openwrt
-          git clone https://RookieZoe:${{ secrets.GITHUB_TOKEN }}@github.com/RookieZoe/mknop.git $GITHUB_WORKSPACE/mknop
 
       - name: Feeds init
         run: |
