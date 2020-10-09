@@ -14,13 +14,6 @@ jobs:
     runs-on: ubuntu-18.04
     if: github.event_name == 'schedule' || github.event.action == 'run-arm64'
     steps:
-      - name: Checkout mknop
-        uses: actions/checkout@v2
-        with:
-          repository: RookieZoe/mknop
-          token: ${{ secrets.PRIVATE_GITHUB_PAT }}
-          path: ${{ github.workspace }}/mknop
-
       - name: Workspace init
         env:
           DEBIAN_FRONTEND: noninteractive
@@ -86,6 +79,13 @@ jobs:
         with:
           name: openwrt-19.07-aarch64-rootfs.tar.gz
           path: ${{ github.workspace }}/targets/rootfs
+
+      - name: Checkout mknop
+        uses: actions/checkout@v2
+        with:
+          repository: RookieZoe/mknop
+          token: ${{ secrets.PRIVATE_GITHUB_PAT }}
+          path: ${{ github.workspace }}/mknop
 
       - name: Make firmware
         if: success()
