@@ -14,11 +14,6 @@ jobs:
     runs-on: ubuntu-18.04
     if: github.event_name == 'schedule' || github.event.action == 'run-x86'
     steps:
-      - name: Checkout configs
-        uses: actions/checkout@v2
-        with:
-          path: ${{ github.workspace }}/configs
-
       - name: Workspace init
         env:
           DEBIAN_FRONTEND: noninteractive
