@@ -102,5 +102,5 @@ jobs:
         if: success()
         uses: actions/upload-artifact@main
         with:
-          name: phicomm-n1-k4.19.106-openwrt-firmware.img
+          name: phicomm-n1-k4.19.106-openwrt-firmware.img.gz
           path: ${{ github.workspace }}/targets/phicomm-n1
