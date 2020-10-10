@@ -92,7 +92,7 @@ jobs:
         run: |
           find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "*rootfs.tar.gz" | xargs -i cp -f {} $GITHUB_WORKSPACE/mknop/openwrt/
           cd $GITHUB_WORKSPACE/mknop/
-          sudo ./make -d
+          sudo ./make -d -k 4.19.106
           mkdir -p $GITHUB_WORKSPACE/targets/phicomm-n1
           cd $GITHUB_WORKSPACE/mknop/out
           gzip $(find ./ -name *.img)
