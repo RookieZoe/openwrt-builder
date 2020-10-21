@@ -21,13 +21,17 @@ n1 img maker: [tuanqing/mknop](https://github.com/tuanqing/mknop)
 
 - luci-app-adbyby-plus
 - luci-app-arpbind
+- luci-app-ddns (arm64)
 - luci-app-fileassistant
 - luci-app-firewall
+- luci-app-hd-idle (arm64)
 - luci-app-netdata
+- luci-app-openvpn (arm64)
+- luci-app-openvpn-server (arm64)
 - luci-app-opkg
 - luci-app-passwall
 - luci-app-ramfree
-- luci-app-samba4
+- luci-app-samba
 - luci-app-sfe
 - luci-app-smartdns
 - luci-app-unblockmusic
