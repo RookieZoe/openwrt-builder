@@ -35,6 +35,8 @@ jobs:
           svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/parted package/parted
           git clone https://github.com/tuanqing/install-program package/install-program
           sed -i -e '/exit 0/d' $GITHUB_WORKSPACE/openwrt/package/default-settings/files/zzz-default-settings
+          echo "R_REVISION=$(date +'R%y.%m.%d')" >> $GITHUB_WORKSPACE/openwrt/package/default-settings/files/zzz-default-settings
+          echo "R_REVISION_L=$(date +'R%y.%m.%d')" >> $GITHUB_WORKSPACE/openwrt/package/default-settings/files/zzz-default-settings
           cat $GITHUB_WORKSPACE/configs/zzz-default-settings.append >> $GITHUB_WORKSPACE/openwrt/package/default-settings/files/zzz-default-settings
           ./scripts/feeds update -a
           cat >> $GITHUB_WORKSPACE/openwrt/feeds/luci/themes/luci-theme-bootstrap/htdocs/luci-static/bootstrap/cascade.css << EOF

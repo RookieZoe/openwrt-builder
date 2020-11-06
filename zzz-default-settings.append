@@ -3,8 +3,6 @@ R_NAME="OpenWrt"
 R_NAME_L="openwrt"
 R_RELEASE="19.07-SNAPSHOT"
 R_RELEASE_L="19.07-snapshot"
-R_REVISION="$(date +"R%y.%m.%d")"
-R_REVISION_L="$(date +"r%y.%m.%d")"
 
 sed -i '/NAME=/d' /usr/lib/os-release
 sed -i '/VERSION=/d' /usr/lib/os-release
