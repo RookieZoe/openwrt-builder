@@ -32,8 +32,7 @@ n1 img maker: [tuanqing/mknop](https://github.com/tuanqing/mknop)
 - luci-app-opkg
 - luci-app-passwall
 - luci-app-ramfree
-- luci-app-samba (arm64)
-- luci-app-samba4 (x86_64)
+- luci-app-samba
 - luci-app-sfe
 - luci-app-smartdns
 - luci-app-unblockmusic
