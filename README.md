@@ -24,14 +24,16 @@ n1 img maker: [tuanqing/mknop](https://github.com/tuanqing/mknop)
 - luci-app-ddns (arm64)
 - luci-app-fileassistant
 - luci-app-firewall
-- luci-app-hd-idle (arm64)
+- luci-app-hd-idle
+- luci-app-diskman (x86_64)
 - luci-app-netdata
 - luci-app-openvpn (arm64)
 - luci-app-openvpn-server (arm64)
 - luci-app-opkg
 - luci-app-passwall
 - luci-app-ramfree
-- luci-app-samba
+- luci-app-samba (arm64)
+- luci-app-samba4 (x86_64)
 - luci-app-sfe
 - luci-app-smartdns
 - luci-app-unblockmusic
