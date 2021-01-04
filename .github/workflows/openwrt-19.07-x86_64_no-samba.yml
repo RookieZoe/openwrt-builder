@@ -1,10 +1,10 @@
-name: openwrt-19.07-x86_64
+name: openwrt-19.07-x86_64_no-samba
 
 on:
   schedule:
     - cron: '0 0 5/15 * *'
   repository_dispatch:
-    types: 'run-x64'
+    types: 'run-x64_no-samba'
 
 env:
   TZ: Asia/Shanghai
@@ -46,7 +46,7 @@ jobs:
       - name: Make defconfig
         run: |
           rm -f $GITHUB_WORKSPACE/openwrt/.config
-          cp $GITHUB_WORKSPACE/configs/openwrt-19.07-x86_64.config $GITHUB_WORKSPACE/openwrt/.config
+          cp $GITHUB_WORKSPACE/configs/openwrt-19.07-x86_64_no-samba.config $GITHUB_WORKSPACE/openwrt/.config
           cd $GITHUB_WORKSPACE/openwrt/
           make defconfig
 
