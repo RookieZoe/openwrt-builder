@@ -29,6 +29,7 @@ jobs:
         run: |
           sed -i -e '/openwrt-luci.git;17.01/d' $GITHUB_WORKSPACE/openwrt/feeds.conf.default
           echo "src-git luci https://github.com/Lienol/openwrt-luci.git;19.07" >> $GITHUB_WORKSPACE/openwrt/feeds.conf.default
+          echo "src-git diy1 https://github.com/xiaorouji/openwrt-passwall.git;main" >> $GITHUB_WORKSPACE/openwrt/feeds.conf.default
           cd $GITHUB_WORKSPACE/openwrt
           svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/parted package/parted
           git clone https://github.com/tuanqing/install-program package/install-program
