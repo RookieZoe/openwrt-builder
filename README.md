@@ -9,7 +9,7 @@ build custom openwrt with github actions
 
 Source Code: [Lienol/openwrt](https://github.com/Lienol/openwrt)
 
-Feeds: ~~[openwrt-19.07.feeds](./openwrt-19.07.feeds)~~ Just change luci version from 17.01 to 19.07 ([code](https://github.com/RookieZoe/openwrt-builder/blob/main/.github/workflows/openwrt-19.07-x86_64.yml#L33))
+Feeds: ~~[openwrt-19.07.feeds](./openwrt-19.07.feeds)~~ Just change luci version from 17.01 to 19.07 ([code](https://github.com/RookieZoe/openwrt-builder/blob/main/.github/workflows/openwrt-19.07-x86_64.yml#L34))
 
 x86_64: [openwrt-19.07-x86_64.config](./openwrt-19.07-x86_64.config)
 
@@ -24,7 +24,7 @@ n1 img maker: [tuanqing/mknop](https://github.com/tuanqing/mknop)
 - luci-app-ddns (arm64)
 - luci-app-fileassistant
 - luci-app-firewall
-- luci-app-hd-idle
+- luci-app-hd-idle (x86_64)
 - luci-app-diskman (x86_64)
 - luci-app-netdata
 - luci-app-openvpn (arm64)
@@ -32,7 +32,7 @@ n1 img maker: [tuanqing/mknop](https://github.com/tuanqing/mknop)
 - luci-app-opkg
 - luci-app-passwall
 - luci-app-ramfree
-- luci-app-samba
+- luci-app-samba (x86_64)
 - luci-app-sfe
 - luci-app-smartdns
 - luci-app-unblockmusic
