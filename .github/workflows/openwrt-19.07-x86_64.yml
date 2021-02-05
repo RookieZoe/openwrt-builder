@@ -40,6 +40,7 @@ jobs:
           cat $GITHUB_WORKSPACE/configs/zzz-default-settings.append >> $GITHUB_WORKSPACE/openwrt/package/default-settings/files/zzz-default-settings
           ./scripts/feeds update -a
           cat >> $GITHUB_WORKSPACE/openwrt/feeds/luci/themes/luci-theme-bootstrap/htdocs/luci-static/bootstrap/cascade.css << EOF
+          #cbi-passwall-global .cbi-tabcontainer[data-tab="Main"] select.cbi-input-select{width:auto;}
           #cbi-passwall-acl_rule .cbi-dropdown:not(.btn):not(.cbi-button),#cbi-passwall-acl_rule .cbi-dynlist{min-width:unset;}
           #list-content table{width:100%;}#list-content table tr td{height:30px;line-height:30px;}
           EOF
