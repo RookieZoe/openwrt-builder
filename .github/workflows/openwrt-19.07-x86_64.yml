@@ -43,6 +43,7 @@ jobs:
           #cbi-passwall-acl_rule .cbi-dropdown:not(.btn):not(.cbi-button),#cbi-passwall-acl_rule .cbi-dynlist{min-width:unset;}
           #list-content table{width:100%;}#list-content table tr td{height:30px;line-height:30px;}
           EOF
+          rm -rf $GITHUB_WORKSPACE/openwrt/feeds/diy1/v2ray
           ./scripts/feeds install -a
 
       - name: Make defconfig
