@@ -81,7 +81,15 @@ jobs:
           mkdir -p $GITHUB_WORKSPACE/targets/vmdk/
           find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "*combined-squashfs*.img.gz" | xargs -i mv -f {} $GITHUB_WORKSPACE/targets/img/
           find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "*combined-squashfs*.vmdk" | xargs -i mv -f {} $GITHUB_WORKSPACE/targets/vmdk/
+          find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "config.buildinfo" | xargs -i mv -f {} $GITHUB_WORKSPACE/targets/config.buildinfo
           tree $GITHUB_WORKSPACE/targets/
+
+      - name: Upload targets [config.buildinfo]
+        if: success()
+        uses: actions/upload-artifact@main
+        with:
+          name: config.buildinfo
+          path: ${{ github.workspace }}/targets/config.buildinfo
 
       - name: Upload targets [img.gz]
         if: success()
