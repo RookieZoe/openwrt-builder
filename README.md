@@ -5,7 +5,7 @@ build custom openwrt with github actions
 ## lienol-19.07-luci19
 
 ![x86_64](https://github.com/RookieZoe/openwrt-builder/workflows/openwrt-19.07-x86_64/badge.svg)
-![arm64](https://github.com/RookieZoe/openwrt-builder/workflows/openwrt-19.07-arm64/badge.svg)
+![x86_64_no-samba](https://github.com/RookieZoe/openwrt-builder/workflows/openwrt-19.07-x86_64_no-samba/badge.svg)
 
 Source Code: [Lienol/openwrt](https://github.com/Lienol/openwrt)
 
@@ -13,28 +13,13 @@ Feeds: ~~[openwrt-19.07.feeds](./openwrt-19.07.feeds)~~ Just change luci version
 
 x86_64: [openwrt-19.07-x86_64.config](./openwrt-19.07-x86_64.config)
 
-arm64: [openwrt-19.07-arm64.config](./openwrt-19.07-arm64.config)
+x86_64_no-samba: [openwrt-19.07-x86_64_no-samba.config](./openwrt-19.07-x86_64_no-samba.config)
+
+~~arm64: [openwrt-19.07-arm64.config](./openwrt-19.07-arm64.config)~~ STOPED.
+
 
 n1 img maker: [tuanqing/mknop](https://github.com/tuanqing/mknop)
 
 ### luci app list
 
-- luci-app-adbyby-plus
-- luci-app-arpbind
-- luci-app-ddns (arm64)
-- luci-app-fileassistant
-- luci-app-firewall
-- luci-app-hd-idle (x86_64)
-- luci-app-diskman (x86_64)
-- luci-app-netdata
-- luci-app-openvpn (arm64)
-- luci-app-openvpn-server (arm64)
-- luci-app-opkg
-- luci-app-passwall
-- luci-app-ramfree
-- luci-app-samba (x86_64)
-- luci-app-sfe
-- luci-app-smartdns
-- luci-app-unblockmusic
-- luci-app-vlmcsd
-- luci-app-zerotier
+见 wiki
