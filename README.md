@@ -17,8 +17,7 @@ x86_64_no-samba: [openwrt-19.07-x86_64_no-samba.config](./openwrt-19.07-x86_64_n
 
 ~~arm64: [openwrt-19.07-arm64.config](./openwrt-19.07-arm64.config)~~ STOPED.
 
-
-n1 img maker: [tuanqing/mknop](https://github.com/tuanqing/mknop)
+~~n1 img maker: [tuanqing/mknop](https://github.com/tuanqing/mknop)~~ for arm64
 
 ### luci app list
 
