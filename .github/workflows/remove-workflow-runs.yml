@@ -11,7 +11,7 @@ on:
       minimum_runs:
         description: 'Minimum runs to keep:'
         required: true
-        default: 0
+        default: 1
 
 jobs:
   del_runs:
