@@ -78,30 +78,24 @@ jobs:
         if: success()
         run: |
           rm -rf $GITHUB_WORKSPACE/targets/
-          mkdir -p $GITHUB_WORKSPACE/targets/img/
-          mkdir -p $GITHUB_WORKSPACE/targets/vmdk/
-          find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "*combined-squashfs*.img.gz" | xargs -i mv -f {} $GITHUB_WORKSPACE/targets/img/
-          find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "*combined-squashfs*.vmdk" | xargs -i mv -f {} $GITHUB_WORKSPACE/targets/vmdk/
-          find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "config.buildinfo" | xargs -i mv -f {} $GITHUB_WORKSPACE/targets/config.buildinfo
+          mkdir -p $GITHUB_WORKSPACE/targets/
+          find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "*openwrt*"  | xargs -i mv -f {} $GITHUB_WORKSPACE/targets/
+          find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "*sha256sums"  | xargs -i mv -f {} $GITHUB_WORKSPACE/targets/
+          find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "*.buildinfo"  | xargs -i mv -f {} $GITHUB_WORKSPACE/targets/
+          find $GITHUB_WORKSPACE/targets/ -name "*combined-squashfs*.img.gz" | xargs -i cp -f {} $GITHUB_WORKSPACE/openwrt-19.07.img.gz
+          find $GITHUB_WORKSPACE/targets/ -name "*rootfs*.tar.gz" | xargs -i cp -f {} $GITHUB_WORKSPACE/openwrt-19.07-rootfs.tar.gz
           tree $GITHUB_WORKSPACE/targets/
 
-      - name: Upload targets [config.buildinfo]
+      - name: Upload targets [all]
         if: success()
         uses: actions/upload-artifact@main
         with:
-          name: config.buildinfo
-          path: ${{ github.workspace }}/targets/config.buildinfo
+          name: all-targets
+          path: ${{ github.workspace }}/targets/
 
-      - name: Upload targets [img.gz]
+      - name: Upload targets [img.gz - for upgrade using]
         if: success()
         uses: actions/upload-artifact@main
         with:
-          name: openwrt-19.07-x86_64.img.gz
-          path: ${{ github.workspace }}/targets/img
-
-      - name: Upload targets [vmdk]
-        if: success()
-        uses: actions/upload-artifact@main
-        with:
-          name: openwrt-19.07-x86_64.vmdk
-          path: ${{ github.workspace }}/targets/vmdk
+          name: openwrt-19.07.img.gz
+          path: ${{ github.workspace }}/openwrt-19.07.img.gz
