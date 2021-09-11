@@ -1,6 +1,9 @@
 name: openwrt-19.07-arm64
 
 on:
+  schedule:
+    - cron: '0 18 4/15 * *' # Runs at 02:00 UTC+8 on the 5 and 20th of every month.
+  workflow_dispatch:
   repository_dispatch:
     types: 'run-arm64'
 
@@ -10,7 +13,7 @@ env:
 jobs:
   build:
     runs-on: ubuntu-18.04
-    if: github.event_name == 'schedule' || github.event.action == 'run-arm64'
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || github.event.action == 'run-arm64'
     steps:
       - name: Workspace init
         env:
@@ -32,8 +35,6 @@ jobs:
           echo "src-git luci https://github.com/Lienol/openwrt-luci.git;19.07" >> $GITHUB_WORKSPACE/openwrt/feeds.conf.default
           echo "src-git diy1 https://github.com/xiaorouji/openwrt-passwall.git;main" >> $GITHUB_WORKSPACE/openwrt/feeds.conf.default
           cd $GITHUB_WORKSPACE/openwrt
-          svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/parted package/parted
-          git clone https://github.com/tuanqing/install-program package/install-program
           sed -i -e '/exit 0/d' $GITHUB_WORKSPACE/openwrt/package/default-settings/files/zzz-default-settings
           echo "R_REVISION=$(date +'R%y.%m.%d')" >> $GITHUB_WORKSPACE/openwrt/package/default-settings/files/zzz-default-settings
           echo "R_REVISION_L=$(date +'R%y.%m.%d')" >> $GITHUB_WORKSPACE/openwrt/package/default-settings/files/zzz-default-settings
@@ -77,38 +78,23 @@ jobs:
         if: success()
         run: |
           rm -rf $GITHUB_WORKSPACE/targets/
-          mkdir -p $GITHUB_WORKSPACE/targets/rootfs
-          find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "*rootfs.tar.gz" | xargs -i cp -f {} $GITHUB_WORKSPACE/targets/rootfs
+          mkdir -p $GITHUB_WORKSPACE/targets/
+          find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "*openwrt*"  | xargs -i mv -f {} $GITHUB_WORKSPACE/targets/
+          find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "*sha256sums"  | xargs -i mv -f {} $GITHUB_WORKSPACE/targets/
+          find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "*.buildinfo"  | xargs -i mv -f {} $GITHUB_WORKSPACE/targets/
+          find $GITHUB_WORKSPACE/targets/ -name "*rootfs*.tar.gz" | xargs -i cp -f {} $GITHUB_WORKSPACE/openwrt-19.07-rootfs.tar.gz
           tree $GITHUB_WORKSPACE/targets/
 
-      - name: Upload targets [rootfs]
+      - name: Upload targets [all]
         if: success()
         uses: actions/upload-artifact@main
         with:
-          name: openwrt-19.07-aarch64-rootfs.tar.gz
-          path: ${{ github.workspace }}/targets/rootfs
+          name: all-targets
+          path: ${{ github.workspace }}/targets/
 
-      - name: Checkout mknop
-        uses: actions/checkout@v2
-        with:
-          repository: RookieZoe/mknop
-          token: ${{ secrets.PRIVATE_GITHUB_PAT }}
-          path: ${{ github.workspace }}/mknop
-
-      - name: Make firmware
-        if: success()
-        run: |
-          find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "*rootfs.tar.gz" | xargs -i cp -f {} $GITHUB_WORKSPACE/mknop/openwrt/
-          cd $GITHUB_WORKSPACE/mknop/
-          sudo ./make -d -k 4.19.106
-          mkdir -p $GITHUB_WORKSPACE/targets/phicomm-n1
-          cd $GITHUB_WORKSPACE/mknop/out
-          gzip $(find ./ -name *.img)
-          mv $(find ./ -name *.img.gz) $GITHUB_WORKSPACE/targets/phicomm-n1
-
-      - name: Upload firmware [phicomm n1]
+      - name: Upload targets [rootfs.tar.gz]
         if: success()
         uses: actions/upload-artifact@main
         with:
-          name: phicomm-n1-k4.19.106-openwrt-firmware.img.gz
-          path: ${{ github.workspace }}/targets/phicomm-n1
+          name: openwrt-19.07-rootfs.tar.gz
+          path: ${{ github.workspace }}/openwrt-19.07-rootfs.tar.gz
