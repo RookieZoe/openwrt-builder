@@ -1,4 +1,4 @@
-#自定义发行信息
+# 自定义发行信息
 R_NAME="OpenWrt"
 R_NAME_L="openwrt"
 R_RELEASE="19.07-SNAPSHOT"

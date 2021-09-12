@@ -1,0 +1,25 @@
+version: '3.9'
+
+services:
+  openwrt:
+    image: rookiezoe/openwrt:latest-x86_64
+    # volumes:
+    #   - ./data/:/overlay/ # see docker-entrypoint.sh
+    restart: always
+    networks:
+      - openwrt-wan
+    privileged: true
+    container_name: openwrt
+
+# 宿主机需要开启网口的混杂模式：
+# need to set promisc "on" at the host:
+# sudo ip link set eth0 promisc on
+networks:
+  openwrt-wan:
+    driver: macvlan
+    driver_opts:
+      parent: eth0
+    ipam:
+      config:
+        - subnet: 192.168.1.0/24
+          gateway: 192.168.1.1
