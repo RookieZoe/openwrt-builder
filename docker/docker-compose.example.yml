@@ -3,12 +3,16 @@ version: '3.9'
 services:
   openwrt:
     image: rookiezoe/openwrt:latest-x86_64
-    # volumes:
-    #   - ./data/:/overlay/ # see docker-entrypoint.sh
+    volumes:
+      - ./data/:/data/ # see docker-entrypoint.sh
     restart: always
     networks:
       - openwrt-wan
     privileged: true
+    environment: # see docker-entrypoint.sh
+      - LAN_ADDRESS=192.168.51.100
+      - LAN_NETMASK=255.255.254.0
+      - LAN_GATEWAY=192.168.50.1
     container_name: openwrt
 
 # 宿主机需要开启网口的混杂模式：
@@ -21,5 +25,5 @@ networks:
       parent: eth0
     ipam:
       config:
-        - subnet: 192.168.1.0/24
-          gateway: 192.168.1.1
+        - subnet: 192.168.50.0/23
+          gateway: 192.168.50.1

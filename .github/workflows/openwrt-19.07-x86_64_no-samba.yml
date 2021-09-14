@@ -16,6 +16,7 @@ jobs:
     runs-on: ubuntu-18.04
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || github.event.action == 'run-x64_no-samba'
     steps:
+      - uses: actions/checkout@v2
       - name: Workspace init
         env:
           DEBIAN_FRONTEND: noninteractive
@@ -26,7 +27,6 @@ jobs:
           sudo -E apt-get -qq install build-essential asciidoc binutils bzip2 gawk gettext git libncurses5-dev libz-dev patch python3 python2.7 unzip zlib1g-dev lib32gcc1 libc6-dev-i386 subversion flex uglifyjs git-core gcc-multilib p7zip p7zip-full msmtp libssl-dev texinfo libglib2.0-dev xmlto qemu-utils upx libelf-dev autoconf automake libtool autopoint device-tree-compiler g++-multilib antlr3 gperf tree curl
           sudo -E apt-get -y autoremove --purge
           sudo -E apt-get clean
-          git clone https://github.com/RookieZoe/openwrt-builder.git $GITHUB_WORKSPACE/configs
           git clone -b 19.07 --single-branch https://github.com/Lienol/openwrt.git $GITHUB_WORKSPACE/openwrt
 
       - name: Feeds init
@@ -85,7 +85,7 @@ jobs:
           find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "*sha256sums"  | xargs -i mv -f {} $GITHUB_WORKSPACE/targets/
           find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "*.buildinfo"  | xargs -i mv -f {} $GITHUB_WORKSPACE/targets/
           find $GITHUB_WORKSPACE/targets/ -name "*combined-squashfs*.img.gz" | xargs -i cp -f {} $GITHUB_WORKSPACE/openwrt-19.07.img.gz
-          find $GITHUB_WORKSPACE/targets/ -name "*rootfs*.tar.gz" | xargs -i cp -f {} $GITHUB_WORKSPACE/configs/openwrt-19.07-rootfs.tar.gz
+          find $GITHUB_WORKSPACE/targets/ -name "*rootfs*.tar.gz" | xargs -i cp -f {} $GITHUB_WORKSPACE/docker/openwrt-19.07-rootfs.tar.gz
           tree $GITHUB_WORKSPACE/targets/
 
       - name: Upload targets [all]
@@ -113,6 +113,6 @@ jobs:
         with:
           push: true
           tags: ${{ env.DOCKER_REPO_NAME }}:latest-x86_64,${{ env.DOCKER_REPO_NAME }}:${{ env.DOCKER_TAG }}
-          context: ./configs
+          context: ./docker
           build-args: |
             FIRMWARE=openwrt-19.07-rootfs.tar.gz
