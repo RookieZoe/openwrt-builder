@@ -1,55 +1,81 @@
 #!/bin/sh
-# vim:sw=4:ts=4:et
-
 set -e
 
-LAN_ADDRESS=${LAN_ADDRESS:-192.168.1.2}
-LAN_NETMASK=${LAN_NETMASK:-255.255.255.0}
-LAN_GATEWAY=${LAN_GATEWAY:-192.168.1.1}
+CONF_DIR=${CONF_DIR:-}
+LAN_ADDRESS=${LAN_ADDRESS:-}
+LAN_NETMASK=${LAN_NETMASK:-}
+LAN_GATEWAY=${LAN_GATEWAY:-}
 
-# there is /etc/uci-defaults/99-default-settings
-# make sure network settings is after 99-default-settings
-cat >> /etc/uci-defaults/999-default-settings<<EOF
-uci set network.lan.proto='static'
-uci set network.lan.ipaddr='$LAN_ADDRESS'
-uci set network.lan.netmask='$LAN_NETMASK'
-uci set network.lan.gateway='$LAN_GATEWAY'
-uci commit network
-exit 0
-EOF
+network_settings() {
+  # there is /etc/uci-defaults/99-default-settings
+  # make sure network settings is after 99-default-settings
+  echo "uci set network.lan.proto='static'" >/etc/uci-defaults/999-default-settings
+  echo "uci set network.lan.ipaddr='${LAN_ADDRESS}'" >>/etc/uci-defaults/999-default-settings
+  echo "uci set network.lan.netmask='${LAN_NETMASK}'" >>/etc/uci-defaults/999-default-settings
+  echo "uci set network.lan.gateway='${LAN_GATEWAY}'" >>/etc/uci-defaults/999-default-settings
+  echo "uci commit network" >>/etc/uci-defaults/999-default-settings
+  echo "exit 0" >>/etc/uci-defaults/999-default-settings
+}
 
-# todo: config backups
+data_persistence_folder() {
+  local source_dir=$(dirname $1)
+  local source_full=$(cd $1 && pwd)
+  local target_dir=$(cd $CONF_DIR && pwd)
+  local target_full=$target_dir$source_full
 
-# FILE_DIR=/etc
-# find "$FILE_DIR" -follow -type f -name "*" -print | while read -r file; do
-#   relative_path="${file#FILE_DIR/}"
-#   output_path="$output_dir/${relative_path}"
-#   subdir=$(dirname "$relative_path")
-#   # create a subdirectory where the template file exists
-#   mkdir -p "$output_dir/$subdir"
-#   echo >&3 "$ME: Running envsubst on $template to $output_path"
-#   envsubst "$defined_envs" <"$template" >"$output_path"
-# done
+  if [ ! -h "${source_full}" ]; then
+    if [ -e "${target_full}" ]; then
+      # exists
+      echo "set link [ "$source_full" ] to folder [ "$target_full" ]"
+      rm -rf $source_full
+      mkdir -p $source_dir
+    else
+      echo "transfer folder [ "$source_full" ] to [ "$target_full" ]"
+      mkdir -p $(dirname $target_full)
+      mv $source_full $(dirname $target_full)
+    fi
+    ln -sf $target_full $source_full
+  fi
+}
 
-# if [ -z "$(ls -A /overlay/)" ]; then
-#   echo >&3 "$ME: /overlay/ is empty, transfer file to overlay..."
+data_persistence_file() {
+  local source_dir=$(dirname $1)
+  local source_full=$1
+  local target_dir=$(cd $CONF_DIR && pwd)
+  local target_full=$target_dir$source_full
 
-#   cp -af /etc/ /overlay/etc/
-#   rm -rf /etc/
-#   ln -sf /overlay/etc/ /etc/
+  if [ ! -h "${source_full}" ]; then
+    if [ -e "${target_full}" ]; then
+      # exists
+      echo "set link [ "$source_full" ] to file [ "$target_full" ]"
+      rm -rf $source_full
+      mkdir -p $source_dir
+    else
+      echo "transfer file [ "$source_full" ] to [ "$target_full" ]"
+      mkdir -p $(dirname $target_full)
+      mv $source_full $(dirname $target_full)
+    fi
+    ln -sf $target_full $source_full
+  fi
+}
 
-#   cp -af /usr/ /overlay/usr/
-#   rm -rf /usr/
-#   ln -sf /overlay/usr/ /usr/
+if [ -n "${LAN_ADDRESS:-}" ] && [ -n "${LAN_NETMASK:-}" ] && [ -n "${LAN_GATEWAY:-}" ]; then
+  network_settings
+fi
 
-#   cp -af /root/ /overlay/root/
-#   rm -rf /root/
-#   ln -sf /overlay/root/ /root/
-# else
-#   echo >&3 "$ME: /overlay/ is not empty, recover..."
-#   ln -sf /overlay/etc/ /etc/
-#   ln -sf /overlay/usr/ /usr/
-#   ln -sf /overlay/root/ /root/
-# fi
+if [ -d "${CONF_DIR}" ] && [ -w "${CONF_DIR}" ]; then
+  data_persistence_folder /root/
+  data_persistence_folder /usr/share/
+
+  ls -A /etc/ | while read -r file; do
+    if [ $file != "hosts" ] && [ $file != "hostname" ] && [ $file != "resolv.conf" ] && [ $file != "openwrt_release" ]; then
+      if [ -d "/etc/${file}" ] && [ -w "/etc/${file}" ]; then
+        data_persistence_folder "/etc/"$file
+      elif [ -f "/etc/${file}" ] && [ -w "/etc/${file}" ]; then
+        data_persistence_file "/etc/"$file
+      fi
+    fi
+  done
+fi
 
 exec "$@"
