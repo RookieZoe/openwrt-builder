@@ -36,8 +36,8 @@ jobs:
           echo "src-git diy1 https://github.com/xiaorouji/openwrt-passwall.git;main" >> $GITHUB_WORKSPACE/openwrt/feeds.conf.default
           cd $GITHUB_WORKSPACE/openwrt
           sed -i -e '/exit 0/d' $GITHUB_WORKSPACE/openwrt/package/default-settings/files/zzz-default-settings
-          echo "R_REVISION=$(date +'R%y.%m.%d')" >> $GITHUB_WORKSPACE/openwrt/package/default-settings/files/zzz-default-settings
-          echo "R_REVISION_L=$(date +'R%y.%m.%d')" >> $GITHUB_WORKSPACE/openwrt/package/default-settings/files/zzz-default-settings
+          echo "R_REVISION=\${R_REVISION:-$(date +'R%y.%m.%d')}" >> $GITHUB_WORKSPACE/openwrt/package/default-settings/files/zzz-default-settings
+          echo "R_REVISION_L=\${R_REVISION_L:-$(date +'R%y.%m.%d')}" >> $GITHUB_WORKSPACE/openwrt/package/default-settings/files/zzz-default-settings
           cat $GITHUB_WORKSPACE/configs/zzz-default-settings.append >> $GITHUB_WORKSPACE/openwrt/package/default-settings/files/zzz-default-settings
           ./scripts/feeds update -a
           cat >> $GITHUB_WORKSPACE/openwrt/feeds/luci/themes/luci-theme-bootstrap/htdocs/luci-static/bootstrap/cascade.css << EOF

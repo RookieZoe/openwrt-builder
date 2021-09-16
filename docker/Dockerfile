@@ -1,11 +1,12 @@
 FROM scratch
 LABEL maintainer="Rookie_Zoe <i@rookiezoe.com>"
 
-ENV LAN_ADDRESS=192.168.1.2
-ENV LAN_NETMASK=255.255.255.0
-ENV LAN_GATEWAY=192.168.1.1
-
 ARG FIRMWARE
+ARG r_revision
+ARG r_revision_l
+ENV R_REVISION=${r_revision}
+ENV R_REVISION_L=${r_revision_l}
+
 ADD ${FIRMWARE} /
 COPY docker-entrypoint.sh /docker-entrypoint.sh
 

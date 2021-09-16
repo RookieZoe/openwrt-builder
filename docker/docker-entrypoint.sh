@@ -68,7 +68,7 @@ if [ -d "${CONF_DIR}" ] && [ -w "${CONF_DIR}" ]; then
   data_persistence_folder /usr/share/
 
   ls -A /etc/ | while read -r file; do
-    if [ $file != "hosts" ] && [ $file != "hostname" ] && [ $file != "resolv.conf" ] && [ $file != "openwrt_release" ]; then
+    if [ $file != "banner" ] && [ $file != "hostname" ] && [ $file != "hosts" ] && [ $file != "openwrt_release" ] && [ $file != "openwrt_version" ] && [ $file != "resolv.conf" ]; then
       if [ -d "/etc/${file}" ] && [ -w "/etc/${file}" ]; then
         data_persistence_folder "/etc/"$file
       elif [ -f "/etc/${file}" ] && [ -w "/etc/${file}" ]; then
