@@ -1,21 +1,20 @@
-name: openwrt-19.07-x86_64
+name: openwrt-19.07-x86_64_with-samba
 
 on:
   schedule:
     - cron: '0 18 4/15 * *' # Runs at 02:00 UTC+8 on the 5 and 20th of every month.
   workflow_dispatch:
   repository_dispatch:
-    types: 'run-x64'
+    types: 'run-x64_with-samba'
 
 env:
   TZ: Asia/Shanghai
-  DOCKER_REPO_NAME: rookiezoe/openwrt
-  OPENWRT_CONFIG_FILE: openwrt-19.07-x86_64.config
+  OPENWRT_CONFIG_FILE: openwrt-19.07-x86_64_with-samba.config
 
 jobs:
   build:
     runs-on: ubuntu-18.04
-    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || github.event.action == 'run-x64'
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || github.event.action == 'run-x64_with-samba'
     steps:
       - uses: actions/checkout@v2
       - name: Workspace init
@@ -42,16 +41,12 @@ jobs:
       - name: Pack up targets
         if: success()
         run: |
-          echo "DOCKER_TAG=$(date +'%y.%m.%d-x86_64')" >> $GITHUB_ENV
-          echo "R_REVISION=$(date +'R%y.%m.%d')" >> $GITHUB_ENV
-          echo "R_REVISION_L=$(date +'R%y.%m.%d')" >> $GITHUB_ENV
           rm -rf $GITHUB_WORKSPACE/targets/
           mkdir -p $GITHUB_WORKSPACE/targets/
           find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "*openwrt*"  | xargs -i mv -f {} $GITHUB_WORKSPACE/targets/
           find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "*sha256sums"  | xargs -i mv -f {} $GITHUB_WORKSPACE/targets/
           find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "*.buildinfo"  | xargs -i mv -f {} $GITHUB_WORKSPACE/targets/
           find $GITHUB_WORKSPACE/targets/ -name "*combined-squashfs*.img.gz" | xargs -i cp -f {} $GITHUB_WORKSPACE/openwrt-19.07.img.gz
-          find $GITHUB_WORKSPACE/targets/ -name "*rootfs*.tar.gz" | xargs -i cp -f {} $GITHUB_WORKSPACE/docker/openwrt-19.07-rootfs.tar.gz
           tree $GITHUB_WORKSPACE/targets/
 
       - name: Upload targets [all]
@@ -67,20 +62,3 @@ jobs:
         with:
           name: openwrt-19.07.img.gz
           path: ${{ github.workspace }}/openwrt-19.07.img.gz
-
-      - name: Login to DockerHub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: Publish to DockerHub
-        uses: docker/build-push-action@v2
-        with:
-          push: true
-          tags: ${{ env.DOCKER_REPO_NAME }}:latest-x86_64,${{ env.DOCKER_REPO_NAME }}:${{ env.DOCKER_TAG }}
-          context: ./docker
-          build-args: |
-            FIRMWARE=openwrt-19.07-rootfs.tar.gz
-            r_revision=${{ env.R_REVISION }}
-            r_revision_l=${{ env.R_REVISION_L }}
