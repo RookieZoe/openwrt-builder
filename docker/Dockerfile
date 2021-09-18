@@ -2,8 +2,8 @@ FROM scratch
 LABEL maintainer="Rookie_Zoe <i@rookiezoe.com>"
 
 ARG FIRMWARE
-ARG r_revision
-ENV R_REVISION=${r_revision}
+ARG r_version
+ENV R_VERSION=${r_version}
 
 ADD ${FIRMWARE} /
 COPY docker-entrypoint.sh /.docker-entrypoint.sh

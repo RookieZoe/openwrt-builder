@@ -43,7 +43,7 @@ jobs:
         if: success()
         run: |
           echo "DOCKER_TAG=$(date +'aarch64-v%y.%m.%d')" >> $GITHUB_ENV
-          echo "R_REVISION=$(date +'v%y.%m.%d')" >> $GITHUB_ENV
+          echo "R_VERSION=$(date +'v%y.%m.%d')" >> $GITHUB_ENV
           rm -rf $GITHUB_WORKSPACE/targets/
           mkdir -p $GITHUB_WORKSPACE/targets/
           find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "*openwrt*"  | xargs -i mv -f {} $GITHUB_WORKSPACE/targets/
@@ -80,4 +80,4 @@ jobs:
           context: ./docker
           build-args: |
             FIRMWARE=openwrt-19.07-rootfs.tar.gz
-            r_revision=${{ env.R_REVISION }}
+            r_version=${{ env.r_version }}

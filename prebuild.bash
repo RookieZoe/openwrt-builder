@@ -3,6 +3,9 @@ WORK_DIR=$(cd $(dirname $0); pwd)
 GITHUB_WORKSPACE=${GITHUB_WORKSPACE:-$WORK_DIR}
 OPENWRT_CONFIG_FILE=${OPENWRT_CONFIG_FILE:-}
 
+R_VERSION=$(date +'v%y.%m.%d')
+R_DESCRIPTION="OpenWrt "$R_VERSION" Build by Rookie_Zoe"
+
 echo "GITHUB_WORKSPACE="$GITHUB_WORKSPACE
 
 if [ -z $OPENWRT_CONFIG_FILE ]; then
@@ -24,6 +27,16 @@ echo "" >> $GITHUB_WORKSPACE/openwrt/feeds.conf.default
 echo "src-git luci https://github.com/Lienol/openwrt-luci.git;19.07" >> $GITHUB_WORKSPACE/openwrt/feeds.conf.default
 echo "src-git diy1 https://github.com/xiaorouji/openwrt-passwall.git;main" >> $GITHUB_WORKSPACE/openwrt/feeds.conf.default
 
+# replace release info
+sed -i -e '/exit 0/d' $GITHUB_WORKSPACE/openwrt/package/default-settings/files/zzz-default-settings
+echo "sed -i '/BUILD_ID=/d' /usr/lib/os-release" >>$GITHUB_WORKSPACE/openwrt/package/default-settings/files/zzz-default-settings
+echo "sed -i '/DISTRIB_REVISION=/d' /etc/openwrt_release" >>$GITHUB_WORKSPACE/openwrt/package/default-settings/files/zzz-default-settings
+echo "sed -i '/DISTRIB_DESCRIPTION=/d' /etc/openwrt_release" >>$GITHUB_WORKSPACE/openwrt/package/default-settings/files/zzz-default-settings
+echo "echo \"BUILD_ID=\\\"$R_VERSION\\\"\" >> /usr/lib/os-release" >>$GITHUB_WORKSPACE/openwrt/package/default-settings/files/zzz-default-settings
+echo "echo \"DISTRIB_REVISION='$R_VERSION'\" >> /etc/openwrt_release" >>$GITHUB_WORKSPACE/openwrt/package/default-settings/files/zzz-default-settings
+echo "echo \"DISTRIB_DESCRIPTION='$R_DESCRIPTION'\" >> /etc/openwrt_release" >>$GITHUB_WORKSPACE/openwrt/package/default-settings/files/zzz-default-settings
+echo "exit 0" >>$GITHUB_WORKSPACE/openwrt/package/default-settings/files/zzz-default-settings
+
 # feeds update
 ./scripts/feeds update -a
 
@@ -44,7 +57,7 @@ cp $GITHUB_WORKSPACE/configs/$OPENWRT_CONFIG_FILE $GITHUB_WORKSPACE/openwrt/.con
 echo "" >> $GITHUB_WORKSPACE/openwrt/.config
 cat $GITHUB_WORKSPACE/configs/release-info.config >> $GITHUB_WORKSPACE/openwrt/.config
 echo "" >> $GITHUB_WORKSPACE/openwrt/.config
-echo "CONFIG_VERSION_CODE=\"$(date +'v%y.%m.%d')\"">> $GITHUB_WORKSPACE/openwrt/.config
+echo "CONFIG_VERSION_NUMBER=\"$(date +'v%y.%m.%d')\"">> $GITHUB_WORKSPACE/openwrt/.config
 
 make defconfig
 
