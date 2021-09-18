@@ -42,9 +42,8 @@ jobs:
       - name: Pack up targets
         if: success()
         run: |
-          echo "DOCKER_TAG=$(date +'%y.%m.%d-aarch64')" >> $GITHUB_ENV
-          echo "R_REVISION=$(date +'R%y.%m.%d')" >> $GITHUB_ENV
-          echo "R_REVISION_L=$(date +'R%y.%m.%d')" >> $GITHUB_ENV
+          echo "DOCKER_TAG=$(date +'aarch64-v%y.%m.%d')" >> $GITHUB_ENV
+          echo "R_REVISION=$(date +'v%y.%m.%d')" >> $GITHUB_ENV
           rm -rf $GITHUB_WORKSPACE/targets/
           mkdir -p $GITHUB_WORKSPACE/targets/
           find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "*openwrt*"  | xargs -i mv -f {} $GITHUB_WORKSPACE/targets/
@@ -77,9 +76,8 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags: ${{ env.DOCKER_REPO_NAME }}:latest-aarch64,${{ env.DOCKER_REPO_NAME }}:${{ env.DOCKER_TAG }}
+          tags: ${{ env.DOCKER_REPO_NAME }}:aarch64-latest,${{ env.DOCKER_REPO_NAME }}:${{ env.DOCKER_TAG }}
           context: ./docker
           build-args: |
             FIRMWARE=openwrt-19.07-rootfs.tar.gz
             r_revision=${{ env.R_REVISION }}
-            r_revision_l=${{ env.R_REVISION_L }}

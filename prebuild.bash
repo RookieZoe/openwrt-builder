@@ -24,12 +24,6 @@ echo "" >> $GITHUB_WORKSPACE/openwrt/feeds.conf.default
 echo "src-git luci https://github.com/Lienol/openwrt-luci.git;19.07" >> $GITHUB_WORKSPACE/openwrt/feeds.conf.default
 echo "src-git diy1 https://github.com/xiaorouji/openwrt-passwall.git;main" >> $GITHUB_WORKSPACE/openwrt/feeds.conf.default
 
-# add some custom default-settings
-sed -i -e '/exit 0/d' $GITHUB_WORKSPACE/openwrt/package/default-settings/files/zzz-default-settings
-echo "R_REVISION=\${R_REVISION:-$(date +'R%y.%m.%d')}" >> $GITHUB_WORKSPACE/openwrt/package/default-settings/files/zzz-default-settings
-echo "R_REVISION_L=\${R_REVISION_L:-$(date +'R%y.%m.%d')}" >> $GITHUB_WORKSPACE/openwrt/package/default-settings/files/zzz-default-settings
-cat $GITHUB_WORKSPACE/configs/zzz-default-settings.append >> $GITHUB_WORKSPACE/openwrt/package/default-settings/files/zzz-default-settings
-
 # feeds update
 ./scripts/feeds update -a
 
@@ -47,6 +41,11 @@ EOF
 rm -f $GITHUB_WORKSPACE/openwrt/.config
 rm -f $GITHUB_WORKSPACE/openwrt/.config.old
 cp $GITHUB_WORKSPACE/configs/$OPENWRT_CONFIG_FILE $GITHUB_WORKSPACE/openwrt/.config
+echo "" >> $GITHUB_WORKSPACE/openwrt/.config
+cat $GITHUB_WORKSPACE/configs/release-info.config >> $GITHUB_WORKSPACE/openwrt/.config
+echo "" >> $GITHUB_WORKSPACE/openwrt/.config
+echo "CONFIG_VERSION_CODE=\"$(date +'v%y.%m.%d')\"">> $GITHUB_WORKSPACE/openwrt/.config
+
 make defconfig
 
 # make download

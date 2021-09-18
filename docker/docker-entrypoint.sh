@@ -6,6 +6,15 @@ LAN_ADDRESS=${LAN_ADDRESS:-}
 LAN_NETMASK=${LAN_NETMASK:-}
 LAN_GATEWAY=${LAN_GATEWAY:-}
 
+reset_reversion() {
+  local build_id=$(cat /usr/lib/os-release | grep "BUILD_ID" | awk -F'BUILD_ID="' 'NR==1{print $2}' | awk -F'"' '{print $1}')
+
+  sed -i -e "s/$build_id/$R_REVISION/g" /etc/banner
+  sed -i -e "s/$build_id/$R_REVISION/g" /etc/openwrt_release
+  sed -i -e "s/$build_id/$R_REVISION/g" /etc/openwrt_version
+  sed -i -e "s/$build_id/$R_REVISION/g" /usr/lib/os-release
+}
+
 network_settings() {
   # there is /etc/uci-defaults/99-default-settings
   # make sure network settings is after 99-default-settings
@@ -58,6 +67,10 @@ data_persistence_file() {
     ln -sf $target_full $source_full
   fi
 }
+
+if [ -n "${R_REVISION}" ]; then
+  reset_reversion
+fi
 
 if [ -n "${LAN_ADDRESS:-}" ] && [ -n "${LAN_NETMASK:-}" ] && [ -n "${LAN_GATEWAY:-}" ]; then
   network_settings
