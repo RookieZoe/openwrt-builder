@@ -1,4 +1,6 @@
 #!/bin/bash
+set -e
+
 WORK_DIR=$(cd $(dirname $0); pwd)
 GITHUB_WORKSPACE=${GITHUB_WORKSPACE:-$WORK_DIR}
 OPENWRT_CONFIG_FILE=${OPENWRT_CONFIG_FILE:-}
