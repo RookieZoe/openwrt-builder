@@ -80,4 +80,4 @@ jobs:
           context: ./docker
           build-args: |
             FIRMWARE=openwrt-19.07-rootfs.tar.gz
-            r_version=${{ env.r_version }}
+            R_VERSION=${{ env.R_VERSION }}

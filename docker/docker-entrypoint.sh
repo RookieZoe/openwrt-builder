@@ -7,57 +7,65 @@ LAN_NETMASK=${LAN_NETMASK:-}
 LAN_GATEWAY=${LAN_GATEWAY:-}
 
 reset_reversion() {
-  local R_DESCRIPTION="OpenWrt "$R_VERSION" Build by Rookie_Zoe"
+  echo "reset reversion..."
+  rr_r_description="OpenWrt $R_VERSION Build by Rookie_Zoe"
+
   sed -i '/BUILD_ID=/d' /usr/lib/os-release
   sed -i '/DISTRIB_REVISION=/d' /etc/openwrt_release
   sed -i '/DISTRIB_DESCRIPTION=/d' /etc/openwrt_release
-  echo "BUILD_ID=\"$R_VERSION\"" >>/usr/lib/os-release
-  echo "DISTRIB_REVISION='$R_VERSION'" >>/etc/openwrt_release
-  echo "DISTRIB_DESCRIPTION='$R_DESCRIPTION'" >>/etc/openwrt_release
+
+  echo "BUILD_ID=$R_VERSION" >>/usr/lib/os-release
+  {
+    echo "DISTRIB_REVISION='$R_VERSION'"
+    echo "DISTRIB_DESCRIPTION='$rr_r_description'"
+  } >>/etc/openwrt_release
 }
 
 network_settings() {
+  echo "reset network..."
   # there is /etc/uci-defaults/99-default-settings
   # make sure network settings is after 99-default-settings
-  echo "uci set network.lan.proto='static'" >/etc/uci-defaults/999-default-settings
-  echo "uci set network.lan.ipaddr='${LAN_ADDRESS}'" >>/etc/uci-defaults/999-default-settings
-  echo "uci set network.lan.netmask='${LAN_NETMASK}'" >>/etc/uci-defaults/999-default-settings
-  echo "uci set network.lan.gateway='${LAN_GATEWAY}'" >>/etc/uci-defaults/999-default-settings
-  echo "uci commit network" >>/etc/uci-defaults/999-default-settings
-  echo "exit 0" >>/etc/uci-defaults/999-default-settings
+  {
+    echo "uci set network.lan.proto='static'"
+    echo "uci set network.lan.ipaddr='$LAN_ADDRESS'"
+    echo "uci set network.lan.netmask='$LAN_NETMASK'"
+    echo "uci set network.lan.gateway='$LAN_GATEWAY'"
+    echo "uci commit network"
+    echo "exit 0"
+  } >/etc/uci-defaults/999-default-settings
 }
 
 data_persistence() {
-  local source_full
-  local path_type
+  dp_source_full=""
+  dp_path_type=""
 
-  if [ -d $1 ] && [ -w $1 ]; then
-    source_full=$(cd $1 && pwd)
-    path_type="folder"
-  elif [ -f $1 ] && [ -w $1 ]; then
-    source_full=$1
-    path_type="file"
-  # elif [ -h $1 ] && [ -w $1 ]; then
-  #   source_full=$1
-  #   path_type="link"
+  if [ -d "$1" ] && [ -w "$1" ]; then
+    dp_source_full=$(cd "$1" && pwd)
+    dp_path_type="folder"
+  elif [ -f "$1" ] && [ -w "$1" ]; then
+    dp_source_full="$1"
+    dp_path_type="file"
+  # elif [ -h "$1" ] && [ -w "$1" ]; then
+  #   dp_source_full="$1"
+  #   dp_path_type="link"
   fi
 
-  local source_dir=$(dirname $1)
-  local target_dir=$(cd $CONF_DIR && pwd)
-  local target_full=$target_dir$source_full
+  dp_source_dir=$(dirname "$1")
+  dp_target_dir=$(cd "$CONF_DIR" && pwd)
+  dp_target_full=$dp_target_dir$dp_source_full
 
-  if [ ! -h "${source_full}" ]; then # /etc/bird
-    if [ -e "${target_full}" ]; then # /data/etc/bird
+  if [ ! -h "${dp_source_full}" ]; then # /etc/bird
+    if [ -e "${dp_target_full}" ]; then # /data/etc/bird
       # exists
-      echo "set link [ "$source_full" ] to "$path_type" [ "$target_full" ]"
-      rm -rf $source_full
-      mkdir -p $source_dir
+      echo "set link [ $dp_source_full ] to $dp_path_type [ $dp_target_full ]"
+      rm -rf "$dp_source_full"
+      mkdir -p "$dp_source_dir"
     else
-      echo "transfer [ "$source_full" ] to "$path_type" [ "$target_full" ]"
-      mkdir -p $(dirname $target_full)
-      mv $source_full $(dirname $target_full)
+      echo "transfer [ $dp_source_full ] to $dp_path_type [ $dp_target_full ]"
+      mkdir -p "$(dirname "$dp_target_full")"
+      mv "$dp_source_full" "$(dirname "$dp_target_full")"
     fi
-    ln -sf $target_full $source_full
+    ln -sf "$dp_target_full" "$dp_source_full"
   fi
 }
 
@@ -72,26 +80,25 @@ fi
 if [ -d "${CONF_DIR}" ] && [ -w "${CONF_DIR}" ]; then
   data_persistence /root/
 
-  ls -A /usr/share/ | while read -r file; do
-    case "$file" in
-    passwall | xray)
-      data_persistence "/usr/share/"$file
-      ;;
-    *)
-      # skip
-      ;;
-    esac
+  usr_share_include_names="xray.*\|passwall.*"
+  usr_share_result="$(
+    find /usr/share -maxdepth 1 ! \
+      -type l -a \
+      -regex ".*\($usr_share_include_names\)"
+  )"
+  echo "$usr_share_result" | while read -r file; do
+    data_persistence "$file"
   done
 
-  ls -A /etc/ | while read -r file; do
-    case "$file" in
-    banner | hostname | hosts | openwrt_release | openwrt_version | preinit | resolv.conf)
-      # skip
-      ;;
-    *)
-      data_persistence "/etc/"$file
-      ;;
-    esac
+  etc_exclude_names="banner.*\|hostname.*\|hosts.*\|openwrt_.*\|opkg.*\|preinit.*\resolv.*"
+  etc_result="$(
+    find /etc -maxdepth 1 \
+      ! -type l -a \
+      ! -name "etc" -a \
+      ! -regex ".*\($etc_exclude_names\)"
+  )"
+  echo "$etc_result" | while read -r file; do
+    data_persistence "$file"
   done
 fi
 
