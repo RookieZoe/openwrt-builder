@@ -71,22 +71,10 @@ persistence_paths() {
   echo "take the 'and set' of the two lists of files..."
   pl_target_dir=$(cd "$CONF_DIR" && pwd)
   persistence_list="/root\n"
-  usr_share_include_names="xray.*\|passwall.*"
+  persistence_list="$persistence_list/usr/share/xray\n"
+  persistence_list="$persistence_list/usr/share/passwall/rules\n"
+
   etc_exclude_names="banner.*\|hostname.*\|hosts.*\|luci.*\|modules.*\|openwrt_.*\|opkg.*\|preinit.*\|resolv.*\|uci.*\|vmware.*"
-
-  # folders in /usr/share
-  [ -e /usr/share ] && persistence_list="$persistence_list$(
-    find /usr/share -maxdepth 1 \
-      -type d -a ! -name "share" -a \
-      -regex ".*\($usr_share_include_names\)"
-  )\n"
-
-  # files in /usr/share
-  [ -e /usr/share ] && persistence_list="$persistence_list$(
-    find /usr/share -maxdepth 1 \
-      -type f -a ! -name "share" -a \
-      -regex ".*\($usr_share_include_names\)"
-  )\n"
 
   # folders in /etc
   [ -e /etc ] && persistence_list="$persistence_list$(
@@ -100,22 +88,6 @@ persistence_paths() {
     find /etc -maxdepth 1 \
       -type f -a ! -name "etc" -a \
       ! -regex ".*\($etc_exclude_names\)"
-  )\n"
-
-  # folders in $pl_target_dir/usr/share
-  [ -e "$pl_target_dir/usr/share" ] && persistence_list="$persistence_list$(
-    find "$pl_target_dir/usr/share" -maxdepth 1 \
-      -type d -a ! -name "$(basename "$pl_target_dir/usr/share")" -a \
-      -regex ".*\($usr_share_include_names\)" \
-      -exec sh -c 'echo ${0#$1}' {} "$pl_target_dir" \;
-  )\n"
-
-  # files in $pl_target_dir/usr/share
-  [ -e "$pl_target_dir/usr/share" ] && persistence_list="$persistence_list$(
-    find "$pl_target_dir/usr/share" -maxdepth 1 \
-      -type f -a ! -name "$(basename "$pl_target_dir/usr/share")" -a \
-      -regex ".*\($usr_share_include_names\)" \
-      -exec sh -c 'echo ${0#$1}' {} "$pl_target_dir" \;
   )\n"
 
   # folders in $pl_target_dir/etc
