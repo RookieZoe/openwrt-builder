@@ -16,7 +16,7 @@ Dockerfile
 *env.*
 *.log*
 
-!openwrt-19.07-rootfs.tar.gz
+!openwrt-*-rootfs.tar.gz
 
 # Editor directories and files
 .idea

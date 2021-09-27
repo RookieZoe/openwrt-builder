@@ -4,9 +4,7 @@ build custom openwrt with github actions
 
 ## lienol-19.07-luci19
 
-![x86_64](https://github.com/RookieZoe/openwrt-builder/workflows/openwrt-19.07-x86_64/badge.svg)
-![x86_64_with-samba](https://github.com/RookieZoe/openwrt-builder/workflows/openwrt-19.07-x86_64_with-samba/badge.svg)
-![aarch64](https://github.com/RookieZoe/openwrt-builder/workflows/openwrt-19.07-aarch64/badge.svg)
+![openwrt-19.07](https://github.com/RookieZoe/openwrt-builder/workflows/openwrt-19.07/badge.svg)
 
 Source Code: [Lienol/openwrt](https://github.com/Lienol/openwrt)
 

@@ -2,7 +2,7 @@ version: '3.9'
 
 services:
   openwrt:
-    image: rookiezoe/openwrt:latest-x86_64
+    image: rookiezoe/openwrt:latest
     volumes:
       - ./data/:/data/ # see docker-entrypoint.sh
     restart: always

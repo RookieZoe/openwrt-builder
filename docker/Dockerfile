@@ -1,11 +1,11 @@
-FROM scratch
+FROM --platform=$TARGETPLATFORM scratch
 LABEL maintainer="Rookie_Zoe <i@rookiezoe.com>"
 
-ARG FIRMWARE
+ARG TARGETARCH
 ARG R_VERSION
 ENV R_VERSION=${R_VERSION}
 
-ADD ${FIRMWARE} /
+ADD openwrt-19.07-${TARGETARCH}-rootfs.tar.gz /
 COPY docker-entrypoint.sh /.docker-entrypoint.sh
 
 USER root

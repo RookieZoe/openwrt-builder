@@ -1,0 +1,201 @@
+name: openwrt-19.07
+
+on:
+  schedule:
+    - cron: '0 18 4/15 * *' # Runs at 02:00 UTC+8 on the 5 and 20th of every month.
+  workflow_dispatch:
+  repository_dispatch:
+    types: 'run-build-op'
+
+env:
+  TZ: Asia/Shanghai
+  DEBIAN_FRONTEND: noninteractive
+  DOCKER_REPO_NAME: rookiezoe/openwrt
+  OPENWRT_ARM64_CONFIG_FILE: openwrt-19.07-aarch64.config
+  OPENWRT_ARM64_ROOTFS_NAME: openwrt-19.07-arm64-rootfs.tar.gz
+  OPENWRT_AMD64_CONFIG_FILE: openwrt-19.07-x86_64.config
+  OPENWRT_AMD64_ROOTFS_NAME: openwrt-19.07-amd64-rootfs.tar.gz
+  OPENWRT_AMD64_SAMBA_CONFIG_FILE: openwrt-19.07-x86_64_with-samba.config
+
+jobs:
+  build-openwrt:
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Workspace init
+        run: |
+          sudo rm -rf /usr/share/dotnet /etc/mysql /etc/php /etc/apt/sources.list.d /usr/local/lib/android /usr/lib/jvm /opt/ghc
+          sudo -E apt-get -y purge azure-cli ghc* zulu* hhvm llvm* firefox google* dotnet* powershell openjdk* mysql* php*
+          sudo -E apt-get -qq update
+          sudo -E apt-get -qq install build-essential asciidoc binutils bzip2 gawk gettext git libncurses5-dev libz-dev patch python3 python2.7 unzip zlib1g-dev lib32gcc1 libc6-dev-i386 subversion flex uglifyjs git-core gcc-multilib p7zip p7zip-full msmtp libssl-dev texinfo libglib2.0-dev xmlto qemu-utils upx libelf-dev autoconf automake libtool autopoint device-tree-compiler g++-multilib antlr3 gperf tree curl
+          sudo -E apt-get -y autoremove --purge
+          sudo -E apt-get clean
+
+      - name: 1 Multi-thread compile [aarch64]
+        run: |
+          bash $GITHUB_WORKSPACE/prebuild.bash $OPENWRT_ARM64_CONFIG_FILE
+          cd $GITHUB_WORKSPACE/openwrt/
+          make -j $(($(nproc)+1)) V=s
+
+      - name: 2 Single-thread compile [aarch64]
+        if: failure()
+        run: |
+          cd $GITHUB_WORKSPACE/openwrt/
+          make -j 1 V=s
+
+      - name: 3 Pack up targets [aarch64]
+        if: success()
+        run: |
+          rm -rf $GITHUB_WORKSPACE/targets-aarch64/
+          mkdir -p $GITHUB_WORKSPACE/targets-aarch64/
+          find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "*openwrt*"  | xargs -i mv -f {} $GITHUB_WORKSPACE/targets-aarch64/
+          find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "*sha256sums"  | xargs -i mv -f {} $GITHUB_WORKSPACE/targets-aarch64/
+          find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "*.buildinfo"  | xargs -i mv -f {} $GITHUB_WORKSPACE/targets-aarch64/
+          find $GITHUB_WORKSPACE/targets-aarch64/ -name "*rootfs*.tar.gz" | xargs -i mv -f {} $GITHUB_WORKSPACE/$OPENWRT_ARM64_ROOTFS_NAME
+          tree $GITHUB_WORKSPACE/targets-aarch64/
+
+      - name: 4 Upload targets [all] [aarch64]
+        if: success()
+        uses: actions/upload-artifact@v2
+        with:
+          name: all-aarch64-targets
+          path: ${{ github.workspace }}/targets-aarch64/
+
+      - name: 5 Upload targets [rootfs.tar.gz] [aarch64]
+        if: success()
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.OPENWRT_ARM64_ROOTFS_NAME }}
+          path: ${{ github.workspace }}/${{ env.OPENWRT_ARM64_ROOTFS_NAME }}
+
+      - name: 1 Multi-thread compile [x86_64]
+        if: success()
+        run: |
+          rm -rf $GITHUB_WORKSPACE/targets-aarch64/
+          bash $GITHUB_WORKSPACE/prebuild.bash $OPENWRT_AMD64_CONFIG_FILE "REBUILD"
+          cd $GITHUB_WORKSPACE/openwrt/
+          make -j $(($(nproc)+1)) V=s
+
+      - name: 2 Single-thread compile [x86_64]
+        if: failure()
+        run: |
+          cd $GITHUB_WORKSPACE/openwrt/
+          make -j 1 V=s
+
+      - name: 3 Pack up targets [x86_64]
+        if: success()
+        run: |
+          rm -rf $GITHUB_WORKSPACE/targets-x86_64/
+          mkdir -p $GITHUB_WORKSPACE/targets-x86_64/
+          find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "*openwrt*"  | xargs -i mv -f {} $GITHUB_WORKSPACE/targets-x86_64/
+          find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "*sha256sums"  | xargs -i mv -f {} $GITHUB_WORKSPACE/targets-x86_64/
+          find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "*.buildinfo"  | xargs -i mv -f {} $GITHUB_WORKSPACE/targets-x86_64/
+          find $GITHUB_WORKSPACE/targets-x86_64/ -name "*rootfs*.tar.gz" | xargs -i mv -f {} $GITHUB_WORKSPACE/$OPENWRT_AMD64_ROOTFS_NAME
+          find $GITHUB_WORKSPACE/targets-x86_64/ -name "*combined-squashfs*.img.gz" | xargs -i mv -f {} $GITHUB_WORKSPACE/openwrt-19.07-x86_64.img.gz
+          tree $GITHUB_WORKSPACE/targets-x86_64/
+
+      - name: 4 Upload targets [all] [x86_64]
+        if: success()
+        uses: actions/upload-artifact@v2
+        with:
+          name: all-x86_64-targets
+          path: ${{ github.workspace }}/targets-x86_64/
+
+      - name: 5 Upload targets [img.gz - for upgrade using] [x86_64]
+        if: success()
+        uses: actions/upload-artifact@v2
+        with:
+          name: openwrt-19.07-x86_64.img.gz
+          path: ${{ github.workspace }}/openwrt-19.07-x86_64.img.gz
+
+      - name: 6 Upload targets [rootfs.tar.gz] [x86_64]
+        if: success()
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.OPENWRT_AMD64_ROOTFS_NAME }}
+          path: ${{ github.workspace }}/${{ env.OPENWRT_AMD64_ROOTFS_NAME }}
+
+      - name: 1 Multi-thread compile [x86_64-samba]
+        if: success()
+        run: |
+          rm -rf $GITHUB_WORKSPACE/targets-x86_64/
+          bash $GITHUB_WORKSPACE/prebuild.bash $OPENWRT_AMD64_SAMBA_CONFIG_FILE "REBUILD"
+          cd $GITHUB_WORKSPACE/openwrt/
+          make -j $(($(nproc)+1)) V=s
+
+      - name: 2 Single-thread compile [x86_64-samba]
+        if: failure()
+        run: |
+          cd $GITHUB_WORKSPACE/openwrt/
+          make -j 1 V=s
+
+      - name: 3 Pack up targets [x86_64-samba]
+        if: success()
+        run: |
+          rm -rf $GITHUB_WORKSPACE/targets-x86_64-samba/
+          mkdir -p $GITHUB_WORKSPACE/targets-x86_64-samba/
+          find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "*openwrt*"  | xargs -i mv -f {} $GITHUB_WORKSPACE/targets-x86_64-samba/
+          find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "*sha256sums"  | xargs -i mv -f {} $GITHUB_WORKSPACE/targets-x86_64-samba/
+          find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "*.buildinfo"  | xargs -i mv -f {} $GITHUB_WORKSPACE/targets-x86_64-samba/
+          find $GITHUB_WORKSPACE/targets-x86_64-samba/ -name "*rootfs*.tar.gz" | xargs -i mv -f {} $GITHUB_WORKSPACE/$OPENWRT_AMD64_ROOTFS_NAME
+          find $GITHUB_WORKSPACE/targets-x86_64-samba/ -name "*combined-squashfs*.img.gz" | xargs -i mv -f {} $GITHUB_WORKSPACE/openwrt-19.07-x86_64-samba.img.gz
+          tree $GITHUB_WORKSPACE/targets-x86_64-samba/
+
+      - name: 4 Upload targets [all] [x86_64-samba]
+        if: success()
+        uses: actions/upload-artifact@v2
+        with:
+          name: all-x86_64-samba-targets
+          path: ${{ github.workspace }}/targets-x86_64-samba/
+
+      - name: 5 Upload targets [img.gz - for upgrade using] [x86_64-samba]
+        if: success()
+        uses: actions/upload-artifact@v2
+        with:
+          name: openwrt-19.07-x86_64-samba.img.gz
+          path: ${{ github.workspace }}/openwrt-19.07-x86_64-samba.img.gz
+
+  build-docker-image:
+    runs-on: ubuntu-latest
+    needs: [build-openwrt]
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/download-artifact@v2
+        with:
+          name: ${{ env.OPENWRT_ARM64_ROOTFS_NAME }}
+          path: ${{ github.workspace }}/docker
+
+      - uses: actions/download-artifact@v2
+        with:
+          name: ${{ env.OPENWRT_AMD64_ROOTFS_NAME }}
+          path: ${{ github.workspace }}/docker
+
+      - name: Set env
+        run: |
+          echo "DOCKER_TAG=$(date +'%y.%m.%d')" >> $GITHUB_ENV
+          echo "R_VERSION=v$(date +'%y.%m.%d')" >> $GITHUB_ENV
+          ls -R $GITHUB_WORKSPACE/docker/
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Publish to DockerHub
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          tags: ${{ env.DOCKER_REPO_NAME }}:latest,${{ env.DOCKER_REPO_NAME }}:${{ env.DOCKER_TAG }}
+          context: ./docker
+          platforms: linux/amd64,linux/arm64
+          build-args: |
+            R_VERSION=${{ env.R_VERSION }}
