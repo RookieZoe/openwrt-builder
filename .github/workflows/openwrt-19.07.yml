@@ -20,6 +20,7 @@ env:
 jobs:
   build-openwrt:
     runs-on: ubuntu-18.04
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || github.event.action == 'run-build-op'
     steps:
       - uses: actions/checkout@v2
 
