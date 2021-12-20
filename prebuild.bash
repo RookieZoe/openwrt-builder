@@ -26,7 +26,8 @@ prepare_codes_feeds() {
   } >>"$GITHUB_WORKSPACE/openwrt/feeds.conf.default"
 
   # for phicom n1
-  git clone https://github.com/tuanqing/install-program "$GITHUB_WORKSPACE/openwrt/package/install-program"
+  # source code 404
+  # git clone https://github.com/tuanqing/install-program "$GITHUB_WORKSPACE/openwrt/package/install-program"
 
   # replace release info
   sed -i -e '/exit 0/d' "$GITHUB_WORKSPACE/openwrt/package/default-settings/files/zzz-default-settings"
