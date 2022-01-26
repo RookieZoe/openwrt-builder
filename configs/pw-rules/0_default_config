@@ -1,0 +1,421 @@
+config global
+	option enabled '0'
+	option socks_enabled '0'
+	option tcp_node 'nil'
+	option udp_node 'nil'
+	option dns_mode 'pdnsd'
+	option dns_forward '1.1.1.1'
+	option filter_proxy_ipv6 '0'
+	option tcp_proxy_mode 'chnroute'
+	option udp_proxy_mode 'chnroute'
+	option localhost_tcp_proxy_mode 'default'
+	option localhost_udp_proxy_mode 'default'
+	option close_log_tcp '0'
+	option close_log_udp '0'
+	option loglevel 'error'
+	option trojan_loglevel '4'
+
+config global_haproxy
+	option balancing_enable '0'
+
+config global_delay
+	option auto_on '0'
+	option start_daemon '0'
+	option start_delay '1'
+
+config global_forwarding
+	option process '0'
+	option tcp_no_redir_ports 'disable'
+	option udp_no_redir_ports '80,443'
+	option tcp_redir_ports '22,25,53,143,465,587,853,993,995,80,443'
+	option udp_redir_ports '1:65535'
+	option accept_icmp '0'
+	option tcp_proxy_way 'redirect'
+	option ipv6_tproxy '0'
+
+config global_other
+	option status 'big_icon show_check_port show_ip111'
+	option nodes_ping 'auto_ping tcping'
+
+config global_rules
+	option auto_update '0'
+	option chnlist_update '1'
+	option chnroute_update '1'
+	option chnroute6_update '1'
+	option gfwlist_update '1'
+	option geosite_update '1'
+	option geoip_update '1'
+	list gfwlist_url 'https://cdn.jsdelivr.net/gh/Loyalsoldier/v2ray-rules-dat@release/gfw.txt'
+	list chnroute_url 'https://ispip.clang.cn/all_cn_cidr.txt'
+	list chnroute6_url 'https://ispip.clang.cn/all_cn_ipv6.txt'
+	list chnlist_url 'https://cdn.jsdelivr.net/gh/felixonmars/dnsmasq-china-list/accelerated-domains.china.conf'
+	list chnlist_url 'https://cdn.jsdelivr.net/gh/felixonmars/dnsmasq-china-list/apple.china.conf'
+	list chnlist_url 'https://cdn.jsdelivr.net/gh/felixonmars/dnsmasq-china-list/google.china.conf'
+	option v2ray_location_asset '/usr/share/v2ray/'
+
+config global_app
+	option v2ray_file '/usr/bin/v2ray'
+	option xray_file '/usr/bin/xray'
+	option trojan_go_file '/usr/bin/trojan-go'
+	option kcptun_client_file '/usr/bin/kcptun-client'
+	option brook_file '/usr/bin/brook'
+	option trojan_go_latest 'https://api.github.com/repos/peter-tank/trojan-go/releases/latest'
+	option hysteria_file '/usr/bin/hysteria'
+
+config global_subscribe
+	option subscribe_proxy '0'
+	option filter_keyword_mode '1'
+	list filter_discard_list '过期时间'
+	list filter_discard_list '剩余流量'
+	list filter_discard_list 'QQ群'
+	list filter_discard_list '官网'
+
+config auto_switch
+	option enable '0'
+	option testing_time '1'
+	option connect_timeout '3'
+	option retry_num '3'
+	option shunt_logic '1'
+
+config nodes '696cd32c1d5149ee95fd1b3accbad6df'
+	option remarks '分流总节点'
+	option type 'Xray'
+	option protocol '_shunt'
+	option domainStrategy 'IPIfNonMatch'
+	option GAMING 'nil'
+	option NETFLIX 'nil'
+	option TELEGRAM 'nil'
+	option YOUTUBE 'nil'
+	option HK_STREAM 'nil'
+	option US_STREAM 'nil'
+	option OTHER_PROXY 'nil'
+	option DIRECT '_direct'
+	option BT '_direct'
+	option ADS '_blackhole'
+	option default_node 'nil'
+
+config shunt_rules 'GAMING'
+	option remarks 'GAMING'
+	option domain_list 'geosite:ea
+geosite:nintendo
+domain:trustarc.com
+
+domain:battlebreakers.com
+domain:eac-cdn.com
+domain:easy.ac
+domain:easyanticheat.net
+domain:epicgames.com
+domain:fortnite.com
+domain:paragon.com
+domain:playparagon.com
+domain:roborecall.com
+domain:shadowcomplex.com
+domain:spyjinx.com
+domain:unrealengine.com
+domain:unrealtournament.com
+
+domain:ubi.com
+domain:ubisoft.com
+domain:uplay.com
+full:ubisoft-uplay-savegames.s3.amazonaws.com
+full:ubisoft-orbit-savegames.s3.amazonaws.com
+
+domain:playartifact.com
+domain:s.team
+domain:steam-chat.com
+domain:steamcommunity.com
+domain:steamcontent.com
+domain:steamgames.com
+domain:steampowered.com
+domain:steamstat.us
+domain:steamstatic.com
+domain:steamusercontent.com
+domain:underlords.com
+domain:valvesoftware.com
+full:steambroadcast.akamaized.net
+full:steamcdn-a.akamaihd.net
+full:steamcommunity-a.akamaihd.net
+full:steamstore-a.akamaihd.net
+full:steamusercontent-a.akamaihd.net
+full:steamuserimages-a.akamaihd.net
+full:steamvideo-a.akamaihd.net
+
+domain:discord.co
+domain:discord.com
+domain:discord.gg
+domain:discord.gift
+domain:discord.gifts
+domain:discord.media
+domain:discord.new
+domain:discordapp.com
+domain:discordapp.net
+domain:discordstatus.com
+
+domain:battle.net
+domain:blizzard.com
+domain:blizzardgearstore.com
+domain:blz-contentstack.com
+domain:diablo3.com
+domain:diabloimmortal.com
+domain:firesidegatherings.com
+domain:heroesofthestorm.com
+domain:playhearthstone.com
+domain:playoverwatch.com
+domain:playwarcraft3.com
+domain:starcraft.com
+domain:starcraft2.com
+domain:worldofwarcraft.com
+full:blizzard.nefficient.co.kr
+full:blizzcon-a.akamaihd.net
+full:blzddist1-a.akamaihd.net
+full:blzddistkr1-a.akamaihd.net
+full:blzmedia-a.akamaihd.net
+full:blznav.akamaized.net
+full:bnetproduct-a.akamaihd.net
+full:bnetcmsus-a.akamaihd.net
+full:bnetshopus.akamaized.net'
+
+config shunt_rules 'NETFLIX'
+	option remarks 'NETFLIX'
+	option ip_list '23.246.0.0/18
+37.77.184.0/21
+45.57.0.0/17
+64.120.128.0/17
+66.197.128.0/17
+108.175.32.0/20
+192.173.64.0/18
+198.38.96.0/19
+198.45.48.0/20
+34.210.42.111/32
+52.89.124.203/32
+54.148.37.5/32'
+	option domain_list 'domain:fast.com
+domain:netflix.com
+domain:netflix.net
+domain:nflxext.com
+domain:nflximg.com
+domain:nflximg.net
+domain:nflxso.net
+domain:nflxvideo.net
+domain:netflixdnstest0.com
+domain:netflixdnstest1.com
+domain:netflixdnstest2.com
+domain:netflixdnstest3.com
+domain:netflixdnstest4.com
+domain:netflixdnstest5.com
+domain:netflixdnstest6.com
+domain:netflixdnstest7.com
+domain:netflixdnstest8.com
+domain:netflixdnstest9.com
+regexp:.*dualstack.apiproxy-device-prod-nlb-.*
+regexp:.*dualstack.ichnaea-web-.*
+geosite:netflix'
+
+config shunt_rules 'TELEGRAM'
+	option remarks 'TELEGRAM'
+	option domain_list 'geosite:telegram'
+	option ip_list '91.105.192.0/23
+91.108.4.0/22
+91.108.8.0/21
+91.108.16.0/21
+91.108.56.0/22
+95.161.64.0/20
+149.154.160.0/20
+185.76.151.0/24
+2001:67c:4e8::/48
+2001:b28:f23c::/47
+2001:b28:f23f::/48
+2a0a:f280:203::/48'
+
+config shunt_rules 'YOUTUBE'
+	option remarks 'YOUTUBE'
+	option domain_list 'geosite:youtube'
+
+config shunt_rules 'HK_STREAM'
+	option remarks '港区流媒体'
+	option domain_list 'geosite:spotify
+regexp:.*-spotify-com.*
+
+geosite:tvb
+geosite:disney
+
+domain:hbogoasia.com
+domain:hbogoasia.hk
+full:bcbolthboa-a.akamaihd.net
+full:players.brightcove.net
+full:s3-ap-southeast-1.amazonaws.com
+full:dai3fd1oh325y.cloudfront.net
+full:44wilhpljf.execute-api.ap-southeast-1.amazonaws.com
+full:hboasia1-i.akamaihd.net
+full:hboasia2-i.akamaihd.net
+full:hboasia3-i.akamaihd.net
+full:hboasia4-i.akamaihd.net
+full:hboasia5-i.akamaihd.net
+full:cf-images.ap-southeast-1.prod.boltdns.net'
+
+config shunt_rules 'US_STREAM'
+	option remarks '欧美流媒体'
+	option domain_list 'geosite:hbo
+geosite:hulu
+geosite:twitch
+
+domain:tv.apple.com
+full:hls.itunes.apple.com
+full:hls-amt.itunes.apple.com
+full:play-edge.itunes.apple.com
+full:xp.apple.com
+full:xp-daf.itunes-apple.com.akadns.net
+full:xp-daf.apple.com.edgekey.net
+full:hls-svod-aoc-ve.itunes.g.aaplimg.com
+
+avoddashs
+domain:aiv-cdn.net
+domain:aiv-delivery.net
+domain:amazon.fr
+domain:amazon.de
+domain:amazon.com
+domain:amazon.co.jp
+domain:amazon.co.uk
+domain:amazonvideo.cc
+domain:amazonvideo.com
+domain:amazonprimevideos.com
+domain:media-amazon.com
+domain:primevideo.cc
+domain:primevideo.com
+domain:primevideo.info
+domain:primevideo.org
+domain:primevideo.tv
+domain:prime-video.com
+domain:ssl-images-amazon.com
+full:atv-ps.amazon.com
+full:fls-na.amazon.com
+full:avodmp4s3ww-a.akamaihd.net
+full:d25xi40x97liuc.cloudfront.net
+full:dmqdd6hw24ucf.cloudfront.net
+full:dmqdd6hw24ucf.cloudfront.net
+full:d22qjgkvxw22r6.cloudfront.net
+full:d1v5ir2lpwr8os.cloudfront.net
+full:d27xxe7juh1us6.cloudfront.net
+
+domain:vmware.com
+domain:mikrotik.com
+domain:mt.lv'
+
+config shunt_rules 'OTHER_PROXY'
+	option remarks '其他代理'
+	option domain_list 'geosite:rarbg
+geosite:yandex
+
+domain:tvtime.com
+domain:readdle.com
+domain:tozelabs.com
+domain:apptimize.com
+domain:githubmemory.com
+full:vowwm3n619.execute-api.eu-west-1.amazonaws.com
+
+domain:caddyserver.com
+domain:xnyhui.top
+domain:solanium.io
+domain:projectserum.com
+domain:chpok.pw
+
+domain:byteoversea.com
+domain:innos.io
+
+domain:tntv2.xyz
+domain:segment.com
+domain:commscope.com
+domain:gushiciku.cn
+
+domain:cloudflareinsights.com
+domain:clearbitjs.com
+domain:clearbit.com
+domain:amplitude.com
+domain:adsymptotic.com
+domain:datadoghq.com
+domain:gist.github.com'
+
+config shunt_rules 'DIRECT'
+	option remarks '直连'
+	option ip_list 'geoip:cn
+geoip:private
+114.114.114.114
+114.114.115.115
+223.5.5.5
+223.6.6.6
+119.28.28.28
+119.29.29.29
+182.254.116.116
+1.2.4.8
+210.2.4.8
+101.226.4.6
+218.30.118.6
+180.76.76.76
+
+114.114.114.114
+114.114.115.115
+223.5.5.5
+223.6.6.6
+119.28.28.28
+119.29.29.29
+182.254.116.116
+1.2.4.8
+210.2.4.8
+101.226.4.6
+218.30.118.6
+180.76.76.76
+
+101.32.44.6
+
+154.204.56.29
+43.129.97.186
+193.42.25.72
+45.135.117.216
+43.226.26.146
+64.64.235.169
+
+152.70.232.221
+146.56.144.189
+168.138.212.174
+158.101.157.18
+182.254.226.238'
+	option domain_list 'geosite:alibaba
+domain:alicdn.com
+domain:tanx.com
+domain:rantu.com
+
+geosite:bootcss
+geosite:cn
+geosite:douyu
+geosite:jd
+geosite:sina
+
+apple.com.cn
+microsoft.com
+dyndns.com
+rrys.tv
+regexp:.*gov.cn
+domain:tntv2.xyz
+domain:okjike.com
+domain:ruguoapp.com
+domain:jellow.site
+domain:qexw.com
+domain:hosnetwork.com
+domain:flowdata.top
+domain:rookiezoe.com
+domain:leadswarp.com
+domain:linkflowtech.com
+domain:nazaio.com
+domain:racknerd.com
+domain:nutswp.com
+domain:mynj.cn
+domain:jpush.cn
+full:tongji.baidu.com'
+
+config shunt_rules 'BT'
+	option remarks 'BT'
+	option protocol 'bittorrent'
+
+config shunt_rules 'ADS'
+	option remarks '广告'
+	option domain_list 'geosite:category-ads-all'

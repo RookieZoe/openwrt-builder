@@ -51,7 +51,21 @@ prepare_codes_feeds() {
     echo "#cbi-passwall-global .cbi-tabcontainer[data-tab=\"Main\"] select.cbi-input-select{width:auto;}"
     echo "#cbi-passwall-acl_rule .cbi-dropdown:not(.btn):not(.cbi-button),#cbi-passwall-acl_rule .cbi-dynlist{min-width:unset;}"
     echo "#list-content table{width:100%;}#list-content table tr td{height:30px;line-height:30px;}"
+    echo "#cbi-passwall-nodes table td{text-align:left;}"
+    echo "#cbi-passwall-nodes table td.cbi-section-actions input[type="checkbox"]{margin:6px;}"
+    echo "#cbi-passwall-nodes table td.cbi-section-actions input[type="radio"]{margin:6px;}"
   } >>"$GITHUB_WORKSPACE/openwrt/feeds/luci/themes/luci-theme-bootstrap/htdocs/luci-static/bootstrap/cascade.css"
+
+  TARGET_PASSWALL_CONFIG="$GITHUB_WORKSPACE/openwrt/feeds/diy1/luci-app-passwall/root/usr/share/passwall/"
+  cat "$GITHUB_WORKSPACE/configs/pw-rules/0_default_config" >"$TARGET_PASSWALL_CONFIG/0_default_config"
+  cat "$GITHUB_WORKSPACE/configs/pw-rules/block_host" >"$TARGET_PASSWALL_CONFIG/rules/block_host"
+  cat "$GITHUB_WORKSPACE/configs/pw-rules/block_ip" >"$TARGET_PASSWALL_CONFIG/rules/block_ip"
+  cat "$GITHUB_WORKSPACE/configs/pw-rules/direct_host" >"$TARGET_PASSWALL_CONFIG/rules/direct_host"
+  cat "$GITHUB_WORKSPACE/configs/pw-rules/direct_ip" >"$TARGET_PASSWALL_CONFIG/rules/direct_ip"
+  cat "$GITHUB_WORKSPACE/configs/pw-rules/lanlist_ipv4" >"$TARGET_PASSWALL_CONFIG/rules/lanlist_ipv4"
+  cat "$GITHUB_WORKSPACE/configs/pw-rules/lanlist_ipv6" >"$TARGET_PASSWALL_CONFIG/rules/lanlist_ipv6"
+  cat "$GITHUB_WORKSPACE/configs/pw-rules/proxy_host" >"$TARGET_PASSWALL_CONFIG/rules/proxy_host"
+  cat "$GITHUB_WORKSPACE/configs/pw-rules/proxy_ip" >"$TARGET_PASSWALL_CONFIG/rules/proxy_ip"
 
   # feeds install
   ./scripts/feeds install -a
