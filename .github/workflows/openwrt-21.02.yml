@@ -1,4 +1,4 @@
-name: openwrt-19.07
+name: openwrt-21.02
 
 on:
   schedule:
@@ -11,11 +11,11 @@ env:
   TZ: Asia/Shanghai
   DEBIAN_FRONTEND: noninteractive
   DOCKER_REPO_NAME: rookiezoe/openwrt
-  OPENWRT_ARM64_CONFIG_FILE: openwrt-19.07-aarch64.config
-  OPENWRT_ARM64_ROOTFS_NAME: openwrt-19.07-arm64-rootfs.tar.gz
-  OPENWRT_AMD64_CONFIG_FILE: openwrt-19.07-x86_64.config
-  OPENWRT_AMD64_ROOTFS_NAME: openwrt-19.07-amd64-rootfs.tar.gz
-  OPENWRT_AMD64_SAMBA_CONFIG_FILE: openwrt-19.07-x86_64_with-samba.config
+  OPENWRT_ARM64_CONFIG_FILE: openwrt-21.02-aarch64.config
+  OPENWRT_ARM64_ROOTFS_NAME: openwrt-21.02-arm64-rootfs.tar.gz
+  OPENWRT_AMD64_CONFIG_FILE: openwrt-21.02-x86_64.config
+  OPENWRT_AMD64_ROOTFS_NAME: openwrt-21.02-amd64-rootfs.tar.gz
+  OPENWRT_AMD64_SAMBA_CONFIG_FILE: openwrt-21.02-x86_64_with-samba.config
 
 jobs:
   build-openwrt:
@@ -33,9 +33,96 @@ jobs:
           sudo -E apt-get -y autoremove --purge
           sudo -E apt-get clean
 
+      - name: 1 Multi-thread compile [x86_64]
+        if: success()
+        run: |
+          bash $GITHUB_WORKSPACE/prebuild.bash $OPENWRT_AMD64_CONFIG_FILE
+          cd $GITHUB_WORKSPACE/openwrt/
+          make -j $(($(nproc)+1)) V=s
+
+      - name: 2 Single-thread compile [x86_64]
+        if: failure()
+        run: |
+          cd $GITHUB_WORKSPACE/openwrt/
+          make -j 1 V=s
+
+      - name: 3 Pack up targets [x86_64]
+        if: success()
+        run: |
+          rm -rf $GITHUB_WORKSPACE/targets-x86_64/
+          mkdir -p $GITHUB_WORKSPACE/targets-x86_64/
+          find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "*openwrt*"  | xargs -i mv -f {} $GITHUB_WORKSPACE/targets-x86_64/
+          find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "*sha256sums"  | xargs -i mv -f {} $GITHUB_WORKSPACE/targets-x86_64/
+          find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "*.buildinfo"  | xargs -i mv -f {} $GITHUB_WORKSPACE/targets-x86_64/
+          find $GITHUB_WORKSPACE/targets-x86_64/ -name "*rootfs*.tar.gz" | xargs -i mv -f {} $GITHUB_WORKSPACE/$OPENWRT_AMD64_ROOTFS_NAME
+          find $GITHUB_WORKSPACE/targets-x86_64/ -name "*combined-squashfs*.img.gz" | xargs -i mv -f {} $GITHUB_WORKSPACE/openwrt-21.02-x86_64.img.gz
+          tree $GITHUB_WORKSPACE/targets-x86_64/
+
+      - name: 4 Upload targets [all] [x86_64]
+        if: success()
+        uses: actions/upload-artifact@v2
+        with:
+          name: all-x86_64-targets
+          path: ${{ github.workspace }}/targets-x86_64/
+
+      - name: 5 Upload targets [img.gz - for upgrade using] [x86_64]
+        if: success()
+        uses: actions/upload-artifact@v2
+        with:
+          name: openwrt-21.02-x86_64.img.gz
+          path: ${{ github.workspace }}/openwrt-21.02-x86_64.img.gz
+
+      - name: 6 Upload targets [rootfs.tar.gz] [x86_64]
+        if: success()
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.OPENWRT_AMD64_ROOTFS_NAME }}
+          path: ${{ github.workspace }}/${{ env.OPENWRT_AMD64_ROOTFS_NAME }}
+
+      - name: 1 Multi-thread compile [x86_64-samba]
+        if: success()
+        run: |
+          rm -rf $GITHUB_WORKSPACE/targets-x86_64/
+          bash $GITHUB_WORKSPACE/prebuild.bash $OPENWRT_AMD64_SAMBA_CONFIG_FILE "REBUILD"
+          cd $GITHUB_WORKSPACE/openwrt/
+          make -j $(($(nproc)+1)) V=s
+
+      - name: 2 Single-thread compile [x86_64-samba]
+        if: failure()
+        run: |
+          cd $GITHUB_WORKSPACE/openwrt/
+          make -j 1 V=s
+
+      - name: 3 Pack up targets [x86_64-samba]
+        if: success()
+        run: |
+          rm -rf $GITHUB_WORKSPACE/targets-x86_64-samba/
+          mkdir -p $GITHUB_WORKSPACE/targets-x86_64-samba/
+          find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "*openwrt*"  | xargs -i mv -f {} $GITHUB_WORKSPACE/targets-x86_64-samba/
+          find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "*sha256sums"  | xargs -i mv -f {} $GITHUB_WORKSPACE/targets-x86_64-samba/
+          find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "*.buildinfo"  | xargs -i mv -f {} $GITHUB_WORKSPACE/targets-x86_64-samba/
+          find $GITHUB_WORKSPACE/targets-x86_64-samba/ -name "*rootfs*.tar.gz" | xargs -i mv -f {} $GITHUB_WORKSPACE/$OPENWRT_AMD64_ROOTFS_NAME
+          find $GITHUB_WORKSPACE/targets-x86_64-samba/ -name "*combined-squashfs*.img.gz" | xargs -i mv -f {} $GITHUB_WORKSPACE/openwrt-21.02-x86_64-samba.img.gz
+          tree $GITHUB_WORKSPACE/targets-x86_64-samba/
+
+      - name: 4 Upload targets [all] [x86_64-samba]
+        if: success()
+        uses: actions/upload-artifact@v2
+        with:
+          name: all-x86_64-samba-targets
+          path: ${{ github.workspace }}/targets-x86_64-samba/
+
+      - name: 5 Upload targets [img.gz - for upgrade using] [x86_64-samba]
+        if: success()
+        uses: actions/upload-artifact@v2
+        with:
+          name: openwrt-21.02-x86_64-samba.img.gz
+          path: ${{ github.workspace }}/openwrt-21.02-x86_64-samba.img.gz
+
       - name: 1 Multi-thread compile [aarch64]
         run: |
-          bash $GITHUB_WORKSPACE/prebuild.bash $OPENWRT_ARM64_CONFIG_FILE
+          rm -rf $GITHUB_WORKSPACE/targets-x86_64-samba/
+          bash $GITHUB_WORKSPACE/prebuild.bash $OPENWRT_ARM64_CONFIG_FILE "REBUILD"
           cd $GITHUB_WORKSPACE/openwrt/
           make -j $(($(nproc)+1)) V=s
 
@@ -69,93 +156,6 @@ jobs:
         with:
           name: ${{ env.OPENWRT_ARM64_ROOTFS_NAME }}
           path: ${{ github.workspace }}/${{ env.OPENWRT_ARM64_ROOTFS_NAME }}
-
-      - name: 1 Multi-thread compile [x86_64]
-        if: success()
-        run: |
-          rm -rf $GITHUB_WORKSPACE/targets-aarch64/
-          bash $GITHUB_WORKSPACE/prebuild.bash $OPENWRT_AMD64_CONFIG_FILE "REBUILD"
-          cd $GITHUB_WORKSPACE/openwrt/
-          make -j $(($(nproc)+1)) V=s
-
-      - name: 2 Single-thread compile [x86_64]
-        if: failure()
-        run: |
-          cd $GITHUB_WORKSPACE/openwrt/
-          make -j 1 V=s
-
-      - name: 3 Pack up targets [x86_64]
-        if: success()
-        run: |
-          rm -rf $GITHUB_WORKSPACE/targets-x86_64/
-          mkdir -p $GITHUB_WORKSPACE/targets-x86_64/
-          find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "*openwrt*"  | xargs -i mv -f {} $GITHUB_WORKSPACE/targets-x86_64/
-          find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "*sha256sums"  | xargs -i mv -f {} $GITHUB_WORKSPACE/targets-x86_64/
-          find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "*.buildinfo"  | xargs -i mv -f {} $GITHUB_WORKSPACE/targets-x86_64/
-          find $GITHUB_WORKSPACE/targets-x86_64/ -name "*rootfs*.tar.gz" | xargs -i mv -f {} $GITHUB_WORKSPACE/$OPENWRT_AMD64_ROOTFS_NAME
-          find $GITHUB_WORKSPACE/targets-x86_64/ -name "*combined-squashfs*.img.gz" | xargs -i mv -f {} $GITHUB_WORKSPACE/openwrt-19.07-x86_64.img.gz
-          tree $GITHUB_WORKSPACE/targets-x86_64/
-
-      - name: 4 Upload targets [all] [x86_64]
-        if: success()
-        uses: actions/upload-artifact@v2
-        with:
-          name: all-x86_64-targets
-          path: ${{ github.workspace }}/targets-x86_64/
-
-      - name: 5 Upload targets [img.gz - for upgrade using] [x86_64]
-        if: success()
-        uses: actions/upload-artifact@v2
-        with:
-          name: openwrt-19.07-x86_64.img.gz
-          path: ${{ github.workspace }}/openwrt-19.07-x86_64.img.gz
-
-      - name: 6 Upload targets [rootfs.tar.gz] [x86_64]
-        if: success()
-        uses: actions/upload-artifact@v2
-        with:
-          name: ${{ env.OPENWRT_AMD64_ROOTFS_NAME }}
-          path: ${{ github.workspace }}/${{ env.OPENWRT_AMD64_ROOTFS_NAME }}
-
-      - name: 1 Multi-thread compile [x86_64-samba]
-        if: success()
-        run: |
-          rm -rf $GITHUB_WORKSPACE/targets-x86_64/
-          bash $GITHUB_WORKSPACE/prebuild.bash $OPENWRT_AMD64_SAMBA_CONFIG_FILE "REBUILD"
-          cd $GITHUB_WORKSPACE/openwrt/
-          make -j $(($(nproc)+1)) V=s
-
-      - name: 2 Single-thread compile [x86_64-samba]
-        if: failure()
-        run: |
-          cd $GITHUB_WORKSPACE/openwrt/
-          make -j 1 V=s
-
-      - name: 3 Pack up targets [x86_64-samba]
-        if: success()
-        run: |
-          rm -rf $GITHUB_WORKSPACE/targets-x86_64-samba/
-          mkdir -p $GITHUB_WORKSPACE/targets-x86_64-samba/
-          find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "*openwrt*"  | xargs -i mv -f {} $GITHUB_WORKSPACE/targets-x86_64-samba/
-          find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "*sha256sums"  | xargs -i mv -f {} $GITHUB_WORKSPACE/targets-x86_64-samba/
-          find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "*.buildinfo"  | xargs -i mv -f {} $GITHUB_WORKSPACE/targets-x86_64-samba/
-          find $GITHUB_WORKSPACE/targets-x86_64-samba/ -name "*rootfs*.tar.gz" | xargs -i mv -f {} $GITHUB_WORKSPACE/$OPENWRT_AMD64_ROOTFS_NAME
-          find $GITHUB_WORKSPACE/targets-x86_64-samba/ -name "*combined-squashfs*.img.gz" | xargs -i mv -f {} $GITHUB_WORKSPACE/openwrt-19.07-x86_64-samba.img.gz
-          tree $GITHUB_WORKSPACE/targets-x86_64-samba/
-
-      - name: 4 Upload targets [all] [x86_64-samba]
-        if: success()
-        uses: actions/upload-artifact@v2
-        with:
-          name: all-x86_64-samba-targets
-          path: ${{ github.workspace }}/targets-x86_64-samba/
-
-      - name: 5 Upload targets [img.gz - for upgrade using] [x86_64-samba]
-        if: success()
-        uses: actions/upload-artifact@v2
-        with:
-          name: openwrt-19.07-x86_64-samba.img.gz
-          path: ${{ github.workspace }}/openwrt-19.07-x86_64-samba.img.gz
 
   build-docker-image:
     runs-on: ubuntu-latest

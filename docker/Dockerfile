@@ -5,7 +5,7 @@ ARG TARGETARCH
 ARG R_VERSION
 ENV R_VERSION=${R_VERSION}
 
-ADD openwrt-19.07-${TARGETARCH}-rootfs.tar.gz /
+ADD openwrt-21.02-${TARGETARCH}-rootfs.tar.gz /
 COPY docker-entrypoint.sh /.docker-entrypoint.sh
 
 USER root

@@ -15,10 +15,11 @@ REBUILD_FLAG=$2
 prepare_codes_feeds() {
   # pull openwrt source code
   rm -rf "$GITHUB_WORKSPACE/openwrt"
-  git clone -b 19.07 --single-branch https://github.com/Lienol/openwrt.git "$GITHUB_WORKSPACE/openwrt"
+  git clone -b 21.02 --single-branch https://github.com/Lienol/openwrt.git "$GITHUB_WORKSPACE/openwrt"
 
-  # replace luci:17.01 with luci:19.07
-  sed -i -e '/openwrt-luci.git;17.01/d' "$GITHUB_WORKSPACE/openwrt/feeds.conf.default"
+  # replace luci:21.02 with luci:19.07
+  sed -i -e '/openwrt-luci.git;21.02/d' "$GITHUB_WORKSPACE/openwrt/feeds.conf.default"
+  # add diy1
   {
     echo ""
     echo "src-git luci https://github.com/Lienol/openwrt-luci.git;19.07"
