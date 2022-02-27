@@ -7,7 +7,7 @@ on:
       retain_days:
         description: 'Number of days:'
         required: true
-        default: 16
+        default: 31
       minimum_runs:
         description: 'Minimum runs to keep:'
         required: true
