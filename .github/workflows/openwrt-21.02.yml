@@ -1,8 +1,8 @@
 name: openwrt-21.02
 
 on:
-  schedule:
-    - cron: '0 18 4/15 * *' # Runs at 02:00 UTC+8 on the 5 and 20th of every month.
+  #schedule:
+  #  - cron: '0 18 4/15 * *' # Runs at 02:00 UTC+8 on the 5 and 20th of every month.
   workflow_dispatch:
   repository_dispatch:
     types: 'run-build-op'
@@ -34,6 +34,7 @@ jobs:
         run: |
           bash $GITHUB_WORKSPACE/prebuild.bash $OPENWRT_AMD64_CONFIG_FILE
           cd $GITHUB_WORKSPACE/openwrt/
+          make download -j $(($(nproc) + 1)) V=s
           make -j $(($(nproc)+1)) V=s
 
       - name: 2 Single-thread compile [x86_64]

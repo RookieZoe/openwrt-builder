@@ -1,7 +1,7 @@
 name: remove-workflow-runs
 on:
-  schedule:
-    - cron: '55 17 4/15 * *' # Runs at 01:55 UTC+8 on the 5 and 20th of every month.
+  #schedule:
+  #  - cron: '55 17 4/15 * *' # Runs at 01:55 UTC+8 on the 5 and 20th of every month.
   workflow_dispatch:
     inputs:
       retain_days:

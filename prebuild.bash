@@ -23,7 +23,8 @@ prepare_codes_feeds() {
   {
     echo ""
     echo "src-git luci https://github.com/Lienol/openwrt-luci.git;19.07"
-    echo "src-git diy1 https://github.com/xiaorouji/openwrt-passwall.git;main"
+    echo "src-git diy1 git@git.rookiezoe.com:mirror/openwrt-passwall.git;packages"
+    echo "src-git diy2 git@git.rookiezoe.com:zoe/luci-apps.git;master"
   } >>"$GITHUB_WORKSPACE/openwrt/feeds.conf.default"
 
   # for phicom n1
@@ -52,12 +53,12 @@ prepare_codes_feeds() {
     echo "#cbi-passwall-global .cbi-tabcontainer[data-tab=\"Main\"] select.cbi-input-select{width:auto;}"
     echo "#cbi-passwall-acl_rule .cbi-dropdown:not(.btn):not(.cbi-button),#cbi-passwall-acl_rule .cbi-dynlist{min-width:unset;}"
     echo "#list-content table{width:100%;}#list-content table tr td{height:30px;line-height:30px;}"
-    echo "#cbi-passwall-nodes table td{text-align:left;}"
-    echo "#cbi-passwall-nodes table td.cbi-section-actions input[type="checkbox"]{margin:6px;}"
-    echo "#cbi-passwall-nodes table td.cbi-section-actions input[type="radio"]{margin:6px;}"
+    echo "#cbi-passwall-nodes .table .td{text-align:left;}"
+    echo "#cbi-passwall-nodes .table .td.cbi-section-actions input[type=checkbox]{margin:6px;}"
+    echo "#cbi-passwall-nodes .table .td.cbi-section-actions input[type=radio]{margin:6px;}"
   } >>"$GITHUB_WORKSPACE/openwrt/feeds/luci/themes/luci-theme-bootstrap/htdocs/luci-static/bootstrap/cascade.css"
 
-  TARGET_PASSWALL_CONFIG="$GITHUB_WORKSPACE/openwrt/feeds/diy1/luci-app-passwall/root/usr/share/passwall/"
+  TARGET_PASSWALL_CONFIG="$GITHUB_WORKSPACE/openwrt/feeds/diy2/luci-app-passwall/root/usr/share/passwall/"
   cat "$GITHUB_WORKSPACE/configs/pw-rules/0_default_config" >"$TARGET_PASSWALL_CONFIG/0_default_config"
   cat "$GITHUB_WORKSPACE/configs/pw-rules/block_host" >"$TARGET_PASSWALL_CONFIG/rules/block_host"
   cat "$GITHUB_WORKSPACE/configs/pw-rules/block_ip" >"$TARGET_PASSWALL_CONFIG/rules/block_ip"
@@ -88,8 +89,6 @@ prepare_configs() {
   } >>"$GITHUB_WORKSPACE/openwrt/.config"
 
   make defconfig
-  # make download
-  make download -j $(($(nproc) + 1))
 }
 
 echo "GITHUB_WORKSPACE=$GITHUB_WORKSPACE"
