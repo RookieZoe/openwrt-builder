@@ -1,11 +1,11 @@
-name: openwrt-21.02
+name: openwrt-21.02-aarch64
 
 on:
   #schedule:
   #  - cron: '0 18 4/15 * *' # Runs at 02:00 UTC+8 on the 5 and 20th of every month.
   workflow_dispatch:
   repository_dispatch:
-    types: 'run-build-op'
+    types: 'run-build-op-aarch64'
 
 env:
   TZ: Asia/Shanghai
@@ -26,55 +26,48 @@ jobs:
           sudo -E apt-get -y autoremove --purge
           sudo -E apt-get clean
 
-      - name: 1 Multi-thread compile [x86_64]
+      - name: 1 Multi-thread compile [aarch64]
         if: success()
         run: |
+          cd $GITHUB_WORKSPACE/
+          git apply --check configs/aarch64-n1.diff
+          git apply configs/aarch64-n1.diff
           mkdir -p $GITHUB_WORKSPACE/out/
           bash $GITHUB_WORKSPACE/prebuild.bash
           cd $GITHUB_WORKSPACE/openwrt/
           make -j $(($(nproc)+1)) V=s
 
-      - name: 2 Single-thread compile [x86_64]
+      - name: 2 Single-thread compile [aarch64]
         if: failure()
         run: |
           cd $GITHUB_WORKSPACE/openwrt/
           make -j 1 V=s
 
-      - name: 3 Pack up targets [x86_64]
+      - name: 3 Pack up targets [aarch64]
         if: success()
         run: |
-          find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "openwrt-x86-64-generic-squashfs-combined.img.gz" | xargs -i mv -f {} $GITHUB_WORKSPACE/out/openwrt-x86-64-generic-squashfs-combined.img.gz
-          tree $GITHUB_WORKSPACE/targets-x86_64/
+          find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "openwrt-armvirt-64-default-rootfs.tar.gz" | xargs -i mv -f {} $GITHUB_WORKSPACE/out/openwrt-armvirt-64-default-rootfs.tar.gz
+          echo "DISTRO_VERSION=$(date +'v%y.%m.%d')" >> $GITHUB_ENV
 
-      - name: 4 Upload targets [x86_64]
+      - name: 4 Upload targets [aarch64]
         if: success()
         uses: actions/upload-artifact@v2
         with:
-          name: openwrt-x86-64-generic-squashfs-combined.img.gz
-          path: ${{ github.workspace }}/out/openwrt-x86-64-generic-squashfs-combined.img.gz
+          name: openwrt-armvirt-64-default-rootfs.tar.gz
+          path: ${{ github.workspace }}/out/openwrt-armvirt-64-default-rootfs.tar.gz
 
-      - name: 1 Multi-thread compile [x86_64-samba4]
-        if: success()
-        run: |
-          bash $GITHUB_WORKSPACE/prebuild.bash "REBUILD" "x64-samba4"
-          cd $GITHUB_WORKSPACE/openwrt/
-          make -j $(($(nproc)+1)) V=s
+      - name: 5 Package firmware [n1]
+        uses: unifreq/openwrt_packit@master
+        env:
+          OPENWRT_ARMVIRT: ${{ github.workspace }}/out/openwrt-armvirt-64-default-rootfs.tar.gz
+          PACKAGE_SOC: s905d
+          KERNEL_VERSION_NAME: 5.4.184
+          OPENWRT_VER: ${{ env.DISTRO_VERSION }}
+          WHOAMI: Rookie_Zoe
 
-      - name: 2 Single-thread compile [x86_64-samba4]
-        if: failure()
-        run: |
-          cd $GITHUB_WORKSPACE/openwrt/
-          make -j 1 V=s
-
-      - name: 3 Pack up targets [x86_64-samba4]
-        if: success()
-        run: |
-          find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "openwrt-x86-64-generic-squashfs-combined.img.gz" | xargs -i mv -f {} $GITHUB_WORKSPACE/out/openwrt-x86-64-generic-squashfs-combined_samba4.img.gz
-          tree $GITHUB_WORKSPACE/targets-x86_64/
-
-      - name: 4 Upload targets [x86_64-samba4]
+      - name: 6 Upload firmware [n1]
         if: success()
         uses: actions/upload-artifact@v2
         with:
-          name: openwrt-x86-64-generic-squashfs-combined_samba4.img.gz
-          path: ${{ github.workspace }}/out/openwrt-x86-64-generic-squashfs-combined_samba4.img.gz
+          name: openwrt_s905d_n1_${{ env.DISTRO_VERSION }}
+          path: ${{ env.PACKAGED_OUTPUTPATH }}/*

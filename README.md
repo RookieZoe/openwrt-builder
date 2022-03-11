@@ -8,7 +8,7 @@ build custom openwrt with github actions
 
 Source Code: [Lienol/openwrt](https://github.com/Lienol/openwrt)
 
-Feeds: ~~[openwrt-21.02.feeds](./openwrt-21.02.feeds)~~ Just change luci version from 21.02 to 19.07 ([code](https://github.com/RookieZoe/openwrt-builder/blob/main/prebuild.bash#L21))
+Feeds: ~~[openwrt-21.02.feeds](./openwrt-21.02.feeds)~~ Just change luci version from 21.02 to 19.07 ([code](https://github.com/RookieZoe/openwrt-builder/blob/21.02/prebuild.bash#L21))
 
 x86_64: [openwrt-21.02-x86_64.config](./openwrt-21.02-x86_64.config)
 

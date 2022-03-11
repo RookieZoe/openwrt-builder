@@ -9,8 +9,9 @@ WORK_DIR=$(
 R_VERSION=$(date +'v%y.%m.%d')
 R_DESCRIPTION="OpenWrt $R_VERSION Build by Rookie_Zoe"
 GITHUB_WORKSPACE=${GITHUB_WORKSPACE:-$WORK_DIR}
-OPENWRT_CONFIG_FILE=$1
-REBUILD_FLAG=$2
+OPENWRT_CONFIG_FILE="$GITHUB_WORKSPACE/configs/openwrt-21.02-x86_64.config"
+REBUILD_FLAG=$1
+REBUILD_TARGET=$2
 
 prepare_codes_feeds() {
   # pull openwrt source code
@@ -23,13 +24,10 @@ prepare_codes_feeds() {
   {
     echo ""
     echo "src-git luci https://github.com/Lienol/openwrt-luci.git;19.07"
-    echo "src-git diy1 git@git.rookiezoe.com:mirror/openwrt-passwall.git;packages"
-    echo "src-git diy2 git@git.rookiezoe.com:zoe/luci-apps.git;master"
+    echo "src-git diy1 https://github.com/xiaorouji/openwrt-passwall.git;packages"
+    echo "src-git diy2 https://github.com/xiaorouji/openwrt-passwall.git;luci"
+    echo "src-git amlogic https://github.com/ophub/luci-app-amlogic.git;main"
   } >>"$GITHUB_WORKSPACE/openwrt/feeds.conf.default"
-
-  # for phicom n1
-  # source code 404
-  # git clone https://github.com/tuanqing/install-program "$GITHUB_WORKSPACE/openwrt/package/install-program"
 
   # replace release info
   sed -i -e '/exit 0/d' "$GITHUB_WORKSPACE/openwrt/package/default-settings/files/zzz-default-settings"
@@ -74,13 +72,13 @@ prepare_codes_feeds() {
 }
 
 prepare_configs() {
+  cd "$GITHUB_WORKSPACE/openwrt/"
   rm -rf "$GITHUB_WORKSPACE/openwrt/bin/targets/"
   rm -f "$GITHUB_WORKSPACE/openwrt/.config"
   rm -f "$GITHUB_WORKSPACE/openwrt/.config.old"
-  cd "$GITHUB_WORKSPACE/openwrt/"
 
-  echo "Read config $GITHUB_WORKSPACE/configs/$OPENWRT_CONFIG_FILE > $GITHUB_WORKSPACE/openwrt/.config"
-  cat "$GITHUB_WORKSPACE/configs/$OPENWRT_CONFIG_FILE" >"$GITHUB_WORKSPACE/openwrt/.config"
+  echo "Read config $OPENWRT_CONFIG_FILE > $GITHUB_WORKSPACE/openwrt/.config"
+  cat "$OPENWRT_CONFIG_FILE" >"$GITHUB_WORKSPACE/openwrt/.config"
   {
     cat "$GITHUB_WORKSPACE/configs/release-info.config"
     echo ""
@@ -89,6 +87,7 @@ prepare_configs() {
   } >>"$GITHUB_WORKSPACE/openwrt/.config"
 
   make defconfig
+  make download -j $(($(nproc) + 1)) V=s
 }
 
 echo "GITHUB_WORKSPACE=$GITHUB_WORKSPACE"
@@ -102,6 +101,25 @@ echo "OPENWRT_CONFIG_FILE=$OPENWRT_CONFIG_FILE"
 
 if [ "$REBUILD_FLAG" != "REBUILD" ]; then
   prepare_codes_feeds
+fi
+
+if [ "$REBUILD_FLAG" == "REBUILD" ]; then
+  cd "$GITHUB_WORKSPACE"
+  git checkout ./
+
+  case "$REBUILD_TARGET" in
+  'x64-samba4')
+    git apply --check configs/samba4-append.diff
+    git apply configs/samba4-append.diff
+    ;;
+  'aarch64')
+    git apply --check configs/aarch64-n1.diff
+    git apply configs/aarch64-n1.diff
+    ;;
+  esac
+
+  cd "$GITHUB_WORKSPACE/openwrt/"
+  find dl -size -1024c -exec rm -rf {} \;
 fi
 
 prepare_configs
