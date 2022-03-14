@@ -19,6 +19,7 @@ jobs:
 
       - name: Workspace init
         run: |
+          echo "DISTRO_VERSION=$(date +'v%y.%m.%d')" >> $GITHUB_ENV
           sudo rm -rf /usr/share/dotnet /etc/mysql /etc/php /etc/apt/sources.list.d /usr/local/lib/android /usr/lib/jvm /opt/ghc
           sudo -E apt-get -y purge azure-cli ghc* zulu* hhvm llvm* firefox google* dotnet* powershell openjdk* mysql* php*
           sudo -E apt-get -qq update
@@ -78,3 +79,15 @@ jobs:
         with:
           name: openwrt-x86-64-generic-squashfs-combined_samba4.img.gz
           path: ${{ github.workspace }}/out/openwrt-x86-64-generic-squashfs-combined_samba4.img.gz
+
+      - name: 5 Upload targets to release
+        if: success()
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ env.DISTRO_VERSION }}
+          name: ${{ env.DISTRO_VERSION }}
+          artifacts: ${{ github.workspace }}/out/*
+          allowUpdates: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          body: |
+            Auto released by actions
