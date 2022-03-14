@@ -1,8 +1,8 @@
 name: openwrt-21.02
 
 on:
-  #schedule:
-  #  - cron: '0 18 4/15 * *' # Runs at 02:00 UTC+8 on the 5 and 20th of every month.
+  schedule:
+    - cron: '0 18 4/15 * *' # Runs at 02:00 UTC+8 on the 5 and 20th of every month.
   workflow_dispatch:
   repository_dispatch:
     types: 'run-build-op'

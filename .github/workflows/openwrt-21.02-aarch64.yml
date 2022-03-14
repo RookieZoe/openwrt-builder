@@ -1,8 +1,8 @@
 name: openwrt-21.02-aarch64
 
 on:
-  #schedule:
-  #  - cron: '0 18 4/15 * *' # Runs at 02:00 UTC+8 on the 5 and 20th of every month.
+  schedule:
+    - cron: '0 18 4/15 * *' # Runs at 02:00 UTC+8 on the 5 and 20th of every month.
   workflow_dispatch:
   repository_dispatch:
     types: 'run-build-op-aarch64'
@@ -49,7 +49,7 @@ jobs:
           echo "DISTRO_VERSION=$(date +'v%y.%m.%d')" >> $GITHUB_ENV
           find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "openwrt-armvirt-64-default-rootfs.tar.gz" | xargs -i mv -f {} $GITHUB_WORKSPACE/out/openwrt-armvirt-64-default-rootfs.tar.gz
 
-      - name: 3 Package firmware [n1]
+      - name: 3 Package firmware [firmware]
         if: success()
         uses: unifreq/openwrt_packit@master
         env:
@@ -66,13 +66,21 @@ jobs:
           name: openwrt-armvirt-64-default-rootfs.tar.gz
           path: ${{ github.workspace }}/out/openwrt-armvirt-64-default-rootfs.tar.gz
 
+      - name: 4 Prepare targets [firmware]
+        run: |
+          cd ${{ env.PACKAGED_OUTPUTPATH }}/
+          find ./ -follow -type f -name "openwrt_*.img" -print | while read -r img; do
+            gzip "$img"
+          done
+          tree ${{ env.PACKAGED_OUTPUTPATH }}/
+
       - name: 5 Upload firmware to release
         if: success()
         uses: ncipollo/release-action@v1
         with:
           tag: ${{ env.DISTRO_VERSION }}
           name: ${{ env.DISTRO_VERSION }}
-          artifacts: ${{ env.PACKAGED_OUTPUTPATH }}/*,${{ github.workspace }}/out/*
+          artifacts: ${{ env.PACKAGED_OUTPUTPATH }}/*
           allowUpdates: true
           token: ${{ secrets.GITHUB_TOKEN }}
           body: |
