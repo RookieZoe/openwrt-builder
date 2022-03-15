@@ -30,8 +30,8 @@ jobs:
         if: success()
         run: |
           cd $GITHUB_WORKSPACE/
-          git apply --check configs/aarch64-n1.diff
-          git apply configs/aarch64-n1.diff
+          git apply --check configs/diffs/aarch64-n1.diff
+          git apply configs/diffs/aarch64-n1.diff
           mkdir -p $GITHUB_WORKSPACE/out/
           bash $GITHUB_WORKSPACE/prebuild.bash
           cd $GITHUB_WORKSPACE/openwrt/

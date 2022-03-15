@@ -109,12 +109,12 @@ if [ "$REBUILD_FLAG" == "REBUILD" ]; then
 
   case "$REBUILD_TARGET" in
   'x64-samba4')
-    git apply --check configs/samba4-append.diff
-    git apply configs/samba4-append.diff
+    git apply --check configs/diffs/x64-samba4.diff
+    git apply configs/diffs/x64-samba4.diff
     ;;
   'aarch64')
-    git apply --check configs/aarch64-n1.diff
-    git apply configs/aarch64-n1.diff
+    git apply --check configs/diffs/aarch64-n1.diff
+    git apply configs/diffs/aarch64-n1.diff
     ;;
   esac
 
