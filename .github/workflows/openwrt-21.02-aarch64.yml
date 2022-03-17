@@ -20,14 +20,15 @@ jobs:
 
       - name: Workspace init
         run: |
+          sudo -E apt-get -qq install mount util-linux uuid-runtime fdisk parted dosfstools e2fsprogs btrfs-progs
           sudo bash $GITHUB_WORKSPACE/scripts/init-workspace.bash
 
       - name: 1-1 Multi-thread compile [aarch64]
         if: success()
         run: |
           cd $GITHUB_WORKSPACE/
-          git apply --check configs/diffs/aarch64-n1-full.diff
-          git apply configs/diffs/aarch64-n1-full.diff
+          git apply --check configs/diffs/aarch64-n1.diff
+          git apply configs/diffs/aarch64-n1.diff
           mkdir -p $GITHUB_WORKSPACE/out/
           bash $GITHUB_WORKSPACE/scripts/prebuild.bash
           cd $GITHUB_WORKSPACE/openwrt/

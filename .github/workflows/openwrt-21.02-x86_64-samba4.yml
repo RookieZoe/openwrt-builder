@@ -1,0 +1,66 @@
+name: openwrt-21.02-x86_64-samba4
+
+on:
+  schedule:
+    - cron: '0 18 4/15 * *' # Runs at 02:00 UTC+8 on the 5 and 20th of every month.
+  workflow_dispatch:
+
+env:
+  TZ: Asia/Shanghai
+  DEBIAN_FRONTEND: noninteractive
+
+jobs:
+  build-openwrt:
+    runs-on: ubuntu-20.04
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Workspace init
+        run: |
+          echo "DISTRO_VERSION=$(date +'v%y.%m.%d')" >> $GITHUB_ENV
+          sudo bash $GITHUB_WORKSPACE/scripts/init-workspace.bash
+
+      - name: 1-1 Multi-thread compile
+        if: success()
+        run: |
+          cd $GITHUB_WORKSPACE/
+          git apply --check configs/diffs/x64-samba4.diff
+          git apply configs/diffs/x64-samba4.diff
+          mkdir -p $GITHUB_WORKSPACE/out/
+          bash $GITHUB_WORKSPACE/scripts/prebuild.bash
+          cd $GITHUB_WORKSPACE/openwrt/
+          make -j $(($(nproc)+1)) V=s
+
+      - name: 1-2 Single-thread compile
+        if: failure()
+        run: |
+          cd $GITHUB_WORKSPACE/openwrt/
+          make -j 1 V=s
+
+      - name: 3 Pack up targets
+        if: success()
+        run: |
+          find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "openwrt-x86-64-generic-squashfs-combined.img.gz" | xargs -i mv -f {} $GITHUB_WORKSPACE/out/openwrt-x86-64-generic-squashfs-combined_samba4.img.gz
+          tree $GITHUB_WORKSPACE/out/
+
+      - name: 4-1 Upload targets to release
+        if: success()
+        uses: ncipollo/release-action@v1
+        with:
+          tag: latest
+          name: latest
+          body: |
+            Auto released by actions
+            Now is ${{ env.DISTRO_VERSION }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          artifacts: ${{ github.workspace }}/out/*
+          allowUpdates: true
+          replacesArtifacts: true
+
+      - name: 4-2 Upload targets
+        if: failure()
+        uses: actions/upload-artifact@v2
+        with:
+          name: openwrt-x86-64-generic-squashfs-combined_samba4.img.gz
+          path: ${{ github.workspace }}/out/openwrt-x86-64-generic-squashfs-combined_samba4.img.gz

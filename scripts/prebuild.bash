@@ -10,7 +10,7 @@ WORK_DIR=$(
 R_VERSION=$(date +'v%y.%m.%d')
 R_DESCRIPTION="OpenWrt $R_VERSION Build by Rookie_Zoe"
 GITHUB_WORKSPACE=${GITHUB_WORKSPACE:-$WORK_DIR}
-OPENWRT_CONFIG_FILE="$GITHUB_WORKSPACE/configs/openwrt-21.02-x86_64-full.config"
+OPENWRT_CONFIG_FILE="$GITHUB_WORKSPACE/configs/openwrt-21.02-x86_64.config"
 REBUILD_FLAG=$1
 REBUILD_TARGET=$2
 
@@ -110,17 +110,14 @@ if [ "$REBUILD_FLAG" == "REBUILD" ]; then
 
   case "$REBUILD_TARGET" in
   'x64-samba4')
-    git apply --check configs/diffs/x64-samba4-full.diff
-    git apply configs/diffs/x64-samba4-full.diff
+    git apply --check configs/diffs/x64-samba4.diff
+    git apply configs/diffs/x64-samba4.diff
     ;;
   'aarch64')
-    git apply --check configs/diffs/aarch64-n1-full.diff
-    git apply configs/diffs/aarch64-n1-full.diff
+    git apply --check configs/diffs/aarch64-n1.diff
+    git apply configs/diffs/aarch64-n1.diff
     ;;
   esac
-
-  cd "$GITHUB_WORKSPACE/openwrt/"
-  find dl -size -1024c -exec rm -rf {} \;
 fi
 
 prepare_configs
