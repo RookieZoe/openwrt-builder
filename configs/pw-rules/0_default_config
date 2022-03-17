@@ -311,6 +311,7 @@ domain:tvtime.com
 domain:readdle.com
 domain:tozelabs.com
 domain:apptimize.com
+domain:github.com
 domain:githubmemory.com
 full:vowwm3n619.execute-api.eu-west-1.amazonaws.com
 
@@ -334,7 +335,8 @@ domain:clearbit.com
 domain:amplitude.com
 domain:adsymptotic.com
 domain:datadoghq.com
-domain:gist.github.com'
+domain:byrut.org
+domain:rutracker.org'
 
 config shunt_rules 'DIRECT'
 	option remarks '直连'

@@ -9,10 +9,11 @@ on:
 
 env:
   TZ: Asia/Shanghai
+  DEBIAN_FRONTEND: noninteractive
 
 jobs:
   build-openwrt:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || github.event.action == 'run-build-op'
     steps:
       - uses: actions/checkout@v2
@@ -20,12 +21,7 @@ jobs:
       - name: Workspace init
         run: |
           echo "DISTRO_VERSION=$(date +'v%y.%m.%d')" >> $GITHUB_ENV
-          sudo rm -rf /usr/share/dotnet /etc/mysql /etc/php /etc/apt/sources.list.d /usr/local/lib/android /usr/lib/jvm /opt/ghc
-          sudo -E apt-get -y purge azure-cli ghc* zulu* hhvm llvm* firefox google* dotnet* powershell openjdk* mysql* php*
-          sudo -E apt-get -qq update
-          sudo -E apt-get -qq install build-essential asciidoc binutils bzip2 gawk gettext git libncurses5-dev libz-dev patch python3 python2.7 unzip zlib1g-dev lib32gcc1 libc6-dev-i386 subversion flex uglifyjs git-core gcc-multilib p7zip p7zip-full msmtp libssl-dev texinfo libglib2.0-dev xmlto qemu-utils upx libelf-dev autoconf automake libtool autopoint device-tree-compiler g++-multilib antlr3 gperf tree curl mount util-linux uuid-runtime fdisk parted dosfstools e2fsprogs btrfs-progs
-          sudo -E apt-get -y autoremove --purge
-          sudo -E apt-get clean
+          sudo bash $GITHUB_WORKSPACE/scripts/init-workspace.bash
 
       - name: 1 Multi-thread compile [x86_64]
         if: success()
