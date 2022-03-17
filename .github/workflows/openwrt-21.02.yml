@@ -80,10 +80,12 @@ jobs:
         if: success()
         uses: ncipollo/release-action@v1
         with:
-          tag: ${{ env.DISTRO_VERSION }}
-          name: ${{ env.DISTRO_VERSION }}
-          artifacts: ${{ github.workspace }}/out/*
-          allowUpdates: true
-          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: latest
+          name: latest
           body: |
             Auto released by actions
+            Now is ${{ env.DISTRO_VERSION }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          artifacts: ${{ github.workspace }}/out/*
+          allowUpdates: true
+          replacesArtifacts: true

@@ -75,13 +75,15 @@ jobs:
         if: success()
         uses: ncipollo/release-action@v1
         with:
-          tag: ${{ env.DISTRO_VERSION }}
-          name: ${{ env.DISTRO_VERSION }}
-          artifacts: ${{ env.PACKAGED_OUTPUTPATH }}/*
-          allowUpdates: true
-          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: latest
+          name: latest
           body: |
             Auto released by actions
+            Now is ${{ env.DISTRO_VERSION }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          artifacts: ${{ env.PACKAGED_OUTPUTPATH }}/*
+          allowUpdates: true
+          replacesArtifacts: true
 
       - name: 5-2 Upload targets [firmware]
         if: failure()
