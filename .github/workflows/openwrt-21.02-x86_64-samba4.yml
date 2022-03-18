@@ -48,8 +48,8 @@ jobs:
         if: success()
         uses: ncipollo/release-action@v1
         with:
-          tag: latest
-          name: latest
+          tag: ${{ env.DISTRO_VERSION }}
+          name: ${{ env.DISTRO_VERSION }}
           body: |
             Auto released by actions
             Now is ${{ env.DISTRO_VERSION }}
