@@ -4,9 +4,11 @@ build custom openwrt with github actions
 
 ## lienol-21.02-luci19
 
-[![openwrt-21.02](https://img.shields.io/github/workflow/status/RookieZoe/openwrt-builder/openwrt-21.02?color=34d058&label=openwrt&logo=github&logoColor=fff)](https://github.com/RookieZoe/openwrt-builder/actions/workflows/openwrt-21.02.yml)
+[![x86_64](https://img.shields.io/github/workflow/status/RookieZoe/openwrt-builder/openwrt-21.02-x86_64?color=34d058&label=x86_64&logo=github&logoColor=fff)](https://github.com/RookieZoe/openwrt-builder/actions/workflows/openwrt-21.02-x86_64.yml)
 
-[![openwrt-21.02-aarch64](https://img.shields.io/github/workflow/status/RookieZoe/openwrt-builder/openwrt-21.02-aarch64?color=34d058&label=openwrt&logo=github&logoColor=fff)](https://github.com/RookieZoe/openwrt-builder/actions/workflows/openwrt-21.02-aarch64.yml)
+[![x86_64-samba4](https://img.shields.io/github/workflow/status/RookieZoe/openwrt-builder/openwrt-21.02-x86_64-samba4?color=34d058&label=x86_64-samba4&logo=github&logoColor=fff)](https://github.com/RookieZoe/openwrt-builder/actions/workflows/openwrt-21.02-x86_64-samba4)
+
+[![aarch64](https://img.shields.io/github/workflow/status/RookieZoe/openwrt-builder/openwrt-21.02-aarch64?color=34d058&label=aarch64&logo=github&logoColor=fff)](https://github.com/RookieZoe/openwrt-builder/actions/workflows/openwrt-21.02-aarch64.yml)
 
 Source Code: [Lienol/openwrt](https://github.com/Lienol/openwrt)
 
