@@ -20,8 +20,9 @@ jobs:
 
       - name: Workspace init
         run: |
-          sudo -E apt-get -qq install mount util-linux uuid-runtime fdisk parted dosfstools e2fsprogs btrfs-progs
+          echo "DISTRO_VERSION=$(date +'v%y.%m.%d')" >> $GITHUB_ENV
           sudo bash $GITHUB_WORKSPACE/scripts/init-workspace.bash
+          sudo -E apt-get -qq install mount util-linux uuid-runtime fdisk parted dosfstools e2fsprogs btrfs-progs
 
       - name: 1-1 Multi-thread compile [aarch64]
         if: success()
@@ -43,14 +44,15 @@ jobs:
       - name: 2 Pack up targets [aarch64]
         if: success()
         run: |
-          echo "DISTRO_VERSION=$(date +'v%y.%m.%d')" >> $GITHUB_ENV
           find $GITHUB_WORKSPACE/openwrt/bin/targets/ -name "openwrt-armvirt-64-default-rootfs.tar.gz" | xargs -i mv -f {} $GITHUB_WORKSPACE/out/openwrt-armvirt-64-default-rootfs.tar.gz
+          tree $GITHUB_WORKSPACE/out/
 
       - name: 3 Package firmware [firmware]
         if: success()
         uses: unifreq/openwrt_packit@master
         env:
           WHOAMI: Rookie_Zoe
+          GZIP_IMGS: .gz
           OPENWRT_VER: ${{ env.DISTRO_VERSION }}
           PACKAGE_SOC: s905d
           OPENWRT_ARMVIRT: out/openwrt-armvirt-64-default-rootfs.tar.gz
