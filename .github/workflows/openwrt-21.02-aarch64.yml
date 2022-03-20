@@ -54,7 +54,7 @@ jobs:
           WHOAMI: Rookie_Zoe
           GZIP_IMGS: .gz
           OPENWRT_VER: ${{ env.DISTRO_VERSION }}
-          PACKAGE_SOC: s905d
+          PACKAGE_SOC: s905d_s905x3
           OPENWRT_ARMVIRT: out/openwrt-armvirt-64-default-rootfs.tar.gz
           KERNEL_VERSION_NAME: 5.4.185
 
