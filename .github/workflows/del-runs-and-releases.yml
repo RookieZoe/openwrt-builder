@@ -18,9 +18,9 @@ jobs:
         with:
           script: |
             const { owner, repo } = context.repo;
-            let retain_days = ${{ github.event.inputs.retain_days }}
+            let retain_days = ${{ github.event.inputs.retain_days || 16 }};
             if (retain_days < 16) {
-              retain_days = 16
+              retain_days = 16;
             }
             const notafter = new Date().getTime() - retain_days * 24 * 60 * 60 * 1000;
             console.log('>>>>>> Listing workflow_runs');
@@ -53,9 +53,9 @@ jobs:
         with:
           script: |
             const { owner, repo } = context.repo;
-            let retain_days = ${{ github.event.inputs.retain_days }}
+            let retain_days = ${{ github.event.inputs.retain_days || 16 }};
             if (retain_days < 16) {
-              retain_days = 16
+              retain_days = 16;
             }
             const notafter = new Date().getTime() - retain_days * 24 * 60 * 60 * 1000;
             console.log('>>>>>> Listing releases');
