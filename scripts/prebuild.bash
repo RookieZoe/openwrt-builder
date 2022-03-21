@@ -11,8 +11,9 @@ R_VERSION=$(date +'v%y.%m.%d')
 R_DESCRIPTION="OpenWrt $R_VERSION Build by Rookie_Zoe"
 GITHUB_WORKSPACE=${GITHUB_WORKSPACE:-$WORK_DIR}
 OPENWRT_CONFIG_FILE="$GITHUB_WORKSPACE/configs/openwrt-21.02-x86_64.config"
-REBUILD_FLAG=$1
-REBUILD_TARGET=$2
+
+BUILD_TARGET=$1
+REBUILD_FLAG=$2
 
 prepare_codes_feeds() {
   # pull openwrt source code
@@ -73,6 +74,20 @@ prepare_codes_feeds() {
 }
 
 prepare_configs() {
+  cd "$GITHUB_WORKSPACE"
+  git checkout ./
+
+  case "$BUILD_TARGET" in
+  'x64-samba4')
+    git apply --check configs/diffs/x64-samba4.diff
+    git apply configs/diffs/x64-samba4.diff
+    ;;
+  'aarch64')
+    git apply --check configs/diffs/aarch64-n1.diff
+    git apply configs/diffs/aarch64-n1.diff
+    ;;
+  esac
+
   cd "$GITHUB_WORKSPACE/openwrt/"
   rm -rf "$GITHUB_WORKSPACE/openwrt/bin/targets/"
   rm -f "$GITHUB_WORKSPACE/openwrt/.config"
@@ -102,22 +117,6 @@ echo "OPENWRT_CONFIG_FILE=$OPENWRT_CONFIG_FILE"
 
 if [ "$REBUILD_FLAG" != "REBUILD" ]; then
   prepare_codes_feeds
-fi
-
-if [ "$REBUILD_FLAG" == "REBUILD" ]; then
-  cd "$GITHUB_WORKSPACE"
-  git checkout ./
-
-  case "$REBUILD_TARGET" in
-  'x64-samba4')
-    git apply --check configs/diffs/x64-samba4.diff
-    git apply configs/diffs/x64-samba4.diff
-    ;;
-  'aarch64')
-    git apply --check configs/diffs/aarch64-n1.diff
-    git apply configs/diffs/aarch64-n1.diff
-    ;;
-  esac
 fi
 
 prepare_configs

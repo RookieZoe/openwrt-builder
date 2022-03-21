@@ -6,6 +6,7 @@
 .DS_Store
 
 openwrt
+out
 
 build-x86_64.bash
 build-x86_64_no-samba.bash
