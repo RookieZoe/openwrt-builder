@@ -16,6 +16,8 @@ Feeds: ~~openwrt-21.02.feeds~~ Just change luci version from 21.02 to 19.07 ([co
 
 x86_64: [openwrt-21.02-x86_64.config](./configs/openwrt-21.02-x86_64.config)
 
+n1 packing: [unifreq/openwrt_packit](https://github.com/unifreq/openwrt_packit)
+
 ### luci app && package list
 
 见 [wiki](https://github.com/RookieZoe/openwrt-builder/wiki)
