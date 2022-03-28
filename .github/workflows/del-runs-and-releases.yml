@@ -5,79 +5,30 @@ on:
   workflow_dispatch:
     inputs:
       retain_days:
-        description: 'Number of days:'
+        description: 'Retain days:'
         required: true
         default: 31
 
+env:
+  TZ: Asia/Shanghai
+  DEBIAN_FRONTEND: noninteractive
+  RETAIN_DAYS: ${{ github.event.inputs.retain_days }}
+
 jobs:
-  del_runs:
+  del_runs_and_releases:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
       - name: Delete outdate workflow runs
         uses: actions/github-script@v6
         with:
           script: |
-            const { owner, repo } = context.repo;
-            let retain_days = ${{ github.event.inputs.retain_days || 16 }};
-            if (retain_days < 16) {
-              retain_days = 16;
-            }
-            const notafter = new Date().getTime() - retain_days * 24 * 60 * 60 * 1000;
-            console.log('>>>>>> Listing workflow_runs');
-            github.rest.actions
-              .listWorkflowRunsForRepo({ owner, repo })
-              .then(({ data }) => {
-                console.log('>>>>>> Done, now delete workflow_runs...');
-                (data.workflow_runs || [])
-                  .filter(({ name, status, created_at }) => {
-                    return status === 'completed' && new Date(created_at).getTime() < notafter;
-                  })
-                  .forEach(({ id }) => {
-                    console.log('>>>>>> Deleting workflow_runs:', id);
-                    github.rest.actions
-                      .deleteWorkflowRun({ owner, repo, run_id: id })
-                      .then(() => {
-                        console.log('>>>>>> Done');
-                      })
-                      .catch(e => {
-                        console.log('>>>>>> Get error when deleting workflow_runs:', e);
-                      });
-                  });
-              })
-              .catch(e => {
-                console.log('>>>>>> Get error when listing workflow_runs:', e);
-              });
+            const del_outdate_runs = require('./scripts/del-outdate-runs');
+            del_outdate_runs({ github, context });
 
       - name: Delete outdate releases
         uses: actions/github-script@v6
         with:
           script: |
-            const { owner, repo } = context.repo;
-            let retain_days = ${{ github.event.inputs.retain_days || 16 }};
-            if (retain_days < 16) {
-              retain_days = 16;
-            }
-            const notafter = new Date().getTime() - retain_days * 24 * 60 * 60 * 1000;
-            console.log('>>>>>> Listing releases');
-            github.rest.repos
-              .listReleases({ owner, repo })
-              .then(({ data }) => {
-                console.log('>>>>>> Done, now delete releases...');
-                (data || [])
-                  .filter(({ name, tag_name, published_at }) => {
-                    return new Date(published_at).getTime() < notafter;
-                  })
-                  .forEach(({ id }) => {
-                    github.rest.repos
-                      .deleteRelease({ owner, repo, release_id: id })
-                      .then(() => {
-                        console.log('>>>>>> Done');
-                      })
-                      .catch(e => {
-                        console.log('>>>>>> Get error when deleting releases:', e);
-                      });
-                  });
-              })
-              .catch(e => {
-                console.log('>>>>>> Get error when listing releases:', e);
-              });
+            const del_outdate_releases = require('./scripts/del-outdate-releases');
+            del_outdate_releases({ github, context });
