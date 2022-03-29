@@ -1,5 +1,5 @@
 diff --git a/configs/openwrt-21.02-x86_64.config b/configs/openwrt-21.02-x86_64.config
-index 9b5e68f..493ebfb 100644
+index 9b5e68f..7f4af49 100644
 --- a/configs/openwrt-21.02-x86_64.config
 +++ b/configs/openwrt-21.02-x86_64.config
 @@ -1,6 +1,13 @@
@@ -356,7 +356,7 @@ index 9b5e68f..493ebfb 100644
  CONFIG_PACKAGE_open-vm-tools=y
  CONFIG_PACKAGE_openssh-client=y
  CONFIG_PACKAGE_openssh-client-utils=y
-@@ -190,10 +379,16 @@ CONFIG_PACKAGE_openssh-keygen=y
+@@ -190,10 +379,52 @@ CONFIG_PACKAGE_openssh-keygen=y
  CONFIG_PACKAGE_openssh-server-pam=y
  CONFIG_PACKAGE_openssh-sftp-server=y
  # CONFIG_PACKAGE_openssl-util is not set
@@ -370,10 +370,46 @@ index 9b5e68f..493ebfb 100644
  # CONFIG_PACKAGE_samba36-server is not set
 +CONFIG_PACKAGE_samba4-libs=y
 +CONFIG_PACKAGE_samba4-server=y
++CONFIG_PACKAGE_shadow=y
++CONFIG_PACKAGE_shadow-chage=y
++CONFIG_PACKAGE_shadow-chfn=y
++CONFIG_PACKAGE_shadow-chgpasswd=y
++CONFIG_PACKAGE_shadow-chpasswd=y
++CONFIG_PACKAGE_shadow-chsh=y
++CONFIG_PACKAGE_shadow-common=y
++CONFIG_PACKAGE_shadow-expiry=y
++CONFIG_PACKAGE_shadow-faillog=y
++CONFIG_PACKAGE_shadow-gpasswd=y
++CONFIG_PACKAGE_shadow-groupadd=y
++CONFIG_PACKAGE_shadow-groupdel=y
++CONFIG_PACKAGE_shadow-groupmems=y
++CONFIG_PACKAGE_shadow-groupmod=y
++CONFIG_PACKAGE_shadow-groups=y
++CONFIG_PACKAGE_shadow-grpck=y
++CONFIG_PACKAGE_shadow-grpconv=y
++CONFIG_PACKAGE_shadow-grpunconv=y
++CONFIG_PACKAGE_shadow-lastlog=y
++CONFIG_PACKAGE_shadow-login=y
++CONFIG_PACKAGE_shadow-logoutd=y
++CONFIG_PACKAGE_shadow-newgidmap=y
++CONFIG_PACKAGE_shadow-newgrp=y
++CONFIG_PACKAGE_shadow-newuidmap=y
++CONFIG_PACKAGE_shadow-newusers=y
++CONFIG_PACKAGE_shadow-nologin=y
++CONFIG_PACKAGE_shadow-passwd=y
++CONFIG_PACKAGE_shadow-pwck=y
++CONFIG_PACKAGE_shadow-pwconv=y
++CONFIG_PACKAGE_shadow-pwunconv=y
++CONFIG_PACKAGE_shadow-su=y
++CONFIG_PACKAGE_shadow-useradd=y
++CONFIG_PACKAGE_shadow-userdel=y
++CONFIG_PACKAGE_shadow-usermod=y
++CONFIG_PACKAGE_shadow-utils=y
++CONFIG_PACKAGE_shadow-vipw=y
  CONFIG_PACKAGE_shadowsocks-libev-ss-local=y
  CONFIG_PACKAGE_shadowsocks-libev-ss-redir=y
  CONFIG_PACKAGE_shadowsocks-libev-ss-server=y
-@@ -203,28 +398,55 @@ CONFIG_PACKAGE_shadowsocksr-libev-ssr-redir=y
+@@ -203,28 +434,56 @@ CONFIG_PACKAGE_shadowsocksr-libev-ssr-redir=y
  CONFIG_PACKAGE_shadowsocksr-libev-ssr-server=y
  CONFIG_PACKAGE_simple-obfs=y
  CONFIG_PACKAGE_smartdns=y
@@ -420,6 +456,7 @@ index 9b5e68f..493ebfb 100644
  CONFIG_boost-runtime-shared=y
  CONFIG_boost-static-and-shared-libs=y
  CONFIG_boost-variant-release=y
++CONFIG_shadow-all=y
 +CONFIG_PACKAGE_antfs-mount=y
  CONFIG_PACKAGE_iptables-mod-filter=y
 +CONFIG_PACKAGE_kmod-fs-antfs=y
