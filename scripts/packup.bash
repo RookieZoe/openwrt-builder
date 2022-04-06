@@ -1,3 +1,6 @@
+#!/bin/bash
+set -e
+
 WORK_DIR=$(
   cd "$(dirname "$0")"
   cd ../
@@ -28,9 +31,8 @@ case "$PACK_TARGET" in
 esac
 
 mkdir -p "$OUT_DIR"
-find $TARGET_DIR -follow -type f -name "$OP_TARGET_NAME" -print | while read -r file; do
-  mv -f $file "$OUT_DIR/$OP_OUT_NAME" && \
-  pushd "$(dirname "$file")" && \
-  tar -zcvf "$OUT_DIR/$OP_OUT_TARBALL" ./ && \
-  popd
+find "$TARGET_DIR" -follow -type f -name "$OP_TARGET_NAME" -print | while read -r file; do
+  mv -f "$file" "$OUT_DIR/$OP_OUT_NAME"
+  pushd "$(dirname "$file")" && tar -zcvf "$OUT_DIR/$OP_OUT_TARBALL" ./ || exit
+  popd || exit
 done
