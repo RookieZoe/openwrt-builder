@@ -413,6 +413,7 @@ domain:racknerd.com
 domain:nutswp.com
 domain:mynj.cn
 domain:jpush.cn
+domain:vps.hosting
 full:tongji.baidu.com'
 
 config shunt_rules 'BT'
