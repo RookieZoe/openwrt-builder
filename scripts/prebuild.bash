@@ -21,11 +21,11 @@ prepare_codes_feeds() {
   git clone -b 21.02 --single-branch https://github.com/Lienol/openwrt.git "$GITHUB_WORKSPACE/openwrt"
 
   # replace luci:21.02 with luci:19.07
-  sed -i -e '/openwrt-luci.git;21.02/d' "$GITHUB_WORKSPACE/openwrt/feeds.conf.default"
+  # sed -i -e '/openwrt-luci.git;21.02/d' "$GITHUB_WORKSPACE/openwrt/feeds.conf.default"
   # add diy1
   {
     echo ""
-    echo "src-git luci https://github.com/Lienol/openwrt-luci.git;19.07"
+    # echo "src-git luci https://github.com/Lienol/openwrt-luci.git;19.07"
     echo "src-git diy1 https://github.com/xiaorouji/openwrt-passwall.git;packages"
     echo "src-git diy2 https://github.com/xiaorouji/openwrt-passwall.git;luci"
     echo "src-git amlogic https://github.com/ophub/luci-app-amlogic.git;main"
