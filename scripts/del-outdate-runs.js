@@ -1,4 +1,4 @@
-const MIN_RETAIN_DAYS = 16;
+const MIN_RETAIN_DAYS = 0;
 module.exports = ({ github, context }) => {
   const { owner, repo } = context.repo;
   let retain_days = +process.env.RETAIN_DAYS;
