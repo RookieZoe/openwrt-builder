@@ -50,19 +50,19 @@ prepare_codes_feeds() {
 
   # fix some luci-theme-bootstrap style issue
   {
-    echo "header,footer{padding:0 calc((100% - 1100px)/2) !important;}"
-    echo ".cbi-checkbox {display:inline-grid;grid-auto-flow:column;align-content:center;width:fit-content;justify-items:start;justify-content:start;grid-gap:2px;}"
-    echo "[style*='visibility:hidden'],[style*='visibility: hidden']{display:none;}"
-    echo "#list-content table{width:100%;}"
-    echo "#list-content table tr td{height:30px;line-height:30px;text-align:center;}"
-    echo "#list-content table tr td:last-child{text-align:right;padding:0 1.5em;}"
-    echo "#list-content table tr td:first-child,#list-content table tr td:is(.parent-icon){text-align:left;padding:0;}"
-    echo "#list-content table thead tr td{font-weight:bold;padding:0 1.5em !important;}"
-    echo "#cbi-passwall-global .cbi-tabcontainer[data-tab=\"Main\"] select.cbi-input-select{width:auto;}"
-    echo "#cbi-passwall-acl_rule .cbi-dropdown:not(.btn):not(.cbi-button),#cbi-passwall-acl_rule .cbi-dynlist{min-width:unset;}"
-    echo "#cbi-passwall-nodes .table .td{text-align:left;}"
-    echo "#cbi-passwall-nodes .table .td.cbi-section-actions input[type=checkbox]{margin:6px;}"
-    echo "#cbi-passwall-nodes .table .td.cbi-section-actions input[type=radio]{margin:6px;}"
+    echo 'header,footer{padding:0 calc((100% - 1100px)/2) !important;}'
+    echo '.cbi-checkbox {display:inline-grid;grid-auto-flow:column;align-content:center;width:fit-content;justify-items:start;justify-content:start;grid-gap:2px;}'
+    echo '[style*="visibility:hidden"],[style*="visibility: hidden"]{display:none;}'
+    echo '#list-content table{width:100%;}'
+    echo '#list-content table tr td{height:30px;line-height:30px;text-align:center;}'
+    echo '#list-content table tr td:last-child{text-align:right;padding:0 1.5em;}'
+    echo '#list-content table tr td:first-child,#list-content table tr td:is(.parent-icon){text-align:left;padding:0;}'
+    echo '#list-content table thead tr td{font-weight:bold;padding:0 1.5em !important;}'
+    echo '#cbi-passwall-global .cbi-tabcontainer[data-tab="Main"] select.cbi-input-select{width:auto;}'
+    echo '#cbi-passwall-acl_rule .cbi-dropdown:not(.btn):not(.cbi-button),#cbi-passwall-acl_rule .cbi-dynlist{min-width:unset;}'
+    echo '#cbi-passwall-nodes .table .td{text-align:left;}'
+    echo '#cbi-passwall-nodes .table .td.cbi-section-actions input[type=checkbox]{margin:6px;}'
+    echo '#cbi-passwall-nodes .table .td.cbi-section-actions input[type=radio]{margin:6px;}'
   } >>"$GITHUB_WORKSPACE/openwrt/feeds/luci/themes/luci-theme-bootstrap/htdocs/luci-static/bootstrap/cascade.css"
 
   # fix luci modal pannel style issue
