@@ -52,7 +52,7 @@ prepare_codes_feeds() {
   {
     echo "header,footer{padding:0 calc((100% - 1100px)/2) !important;}"
     echo ".cbi-checkbox {display:inline-grid;grid-auto-flow:column;align-content:center;width:fit-content;justify-items:start;justify-content:start;grid-gap:2px;}"
-    echo "[style='visibility:hidden'],[style='visibility:hidden;'],[style='visibility: hidden'],[style='visibility: hidden;']{display:none;}"
+    echo "[style*='visibility:hidden'],[style*='visibility: hidden']{display:none;}"
     echo "#list-content table{width:100%;}"
     echo "#list-content table tr td{height:30px;line-height:30px;text-align:center;}"
     echo "#list-content table tr td:last-child{text-align:right;padding:0 1.5em;}"
@@ -65,6 +65,13 @@ prepare_codes_feeds() {
     echo "#cbi-passwall-nodes .table .td.cbi-section-actions input[type=radio]{margin:6px;}"
   } >>"$GITHUB_WORKSPACE/openwrt/feeds/luci/themes/luci-theme-bootstrap/htdocs/luci-static/bootstrap/cascade.css"
 
+  # fix luci modal pannel style issue
+  LUCI_HEADER_FILE="$GITHUB_WORKSPACE/openwrt/feeds/luci/modules/luci-base/luasrc/view/header.htm"
+  LUCI_HEADER_STYLE_BEGIN=$(cat "$LUCI_HEADER_FILE" | grep -n "<style>" | awk -F ":" '{print $1}')
+  LUCI_HEADER_STYLE_END=$(cat "$LUCI_HEADER_FILE" | grep -n "</style>" | awk -F ":" '{print $1}')
+  sed -i ${LUCI_HEADER_STYLE_BEGIN},${LUCI_HEADER_STYLE_END}d "$GITHUB_WORKSPACE/openwrt/feeds/luci/modules/luci-base/luasrc/view/header.htm"
+
+  # set passwall rules
   TARGET_PASSWALL_CONFIG="$GITHUB_WORKSPACE/openwrt/feeds/diy2/luci-app-passwall/root/usr/share/passwall/"
   cat "$GITHUB_WORKSPACE/configs/pw-rules/0_default_config" >"$TARGET_PASSWALL_CONFIG/0_default_config"
   cat "$GITHUB_WORKSPACE/configs/pw-rules/block_host" >"$TARGET_PASSWALL_CONFIG/rules/block_host"
