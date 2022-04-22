@@ -1,0 +1,48 @@
+.cbi-checkbox {
+  width: fit-content;
+  display: inline-grid;
+  grid-auto-flow: column;
+  grid-gap: 2px;
+  align-content: center;
+  justify-items: start;
+  justify-content: start;
+}
+[style*='visibility:hidden'],
+[style*='visibility: hidden'] {
+  display: none;
+}
+#list-content table {
+  width: 100%;
+}
+#list-content table tr td {
+  height: 30px;
+  line-height: 30px;
+  text-align: center;
+}
+#list-content table tr td:last-child {
+  text-align: right;
+  padding: 0 1.5em;
+}
+#list-content table tr td:first-child,
+#list-content table tr td:is(.parent-icon) {
+  text-align: left;
+  padding: 0;
+}
+#list-content table thead tr td {
+  font-weight: bold;
+  padding: 0 1.5em !important;
+}
+#cbi-passwall-global .cbi-tabcontainer[data-tab='Main'] select.cbi-input-select {
+  width: auto;
+}
+#cbi-passwall-acl_rule .cbi-dropdown:not(.btn):not(.cbi-button),
+#cbi-passwall-acl_rule .cbi-dynlist {
+  min-width: unset;
+}
+#cbi-passwall-nodes .table .td {
+  text-align: left;
+}
+#cbi-passwall-nodes .table .td.cbi-section-actions input[type='radio'],
+#cbi-passwall-nodes .table .td.cbi-section-actions input[type='checkbox'] {
+  margin: 6px;
+}
