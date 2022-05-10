@@ -12,7 +12,7 @@ on:
 env:
   TZ: Asia/Shanghai
   DEBIAN_FRONTEND: noninteractive
-  RETAIN_DAYS: ${{ github.event.inputs.retain_days }}
+  RETAIN_DAYS: ${{ github.event.inputs.retain_days || '31' }}
 
 jobs:
   del_runs_and_releases:
@@ -23,12 +23,10 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const del_outdate_runs = require('./scripts/del-outdate-runs');
-            del_outdate_runs({ github, context });
+            require('./scripts/del-outdate-runs')({ github, context })
 
       - name: Delete outdate releases
         uses: actions/github-script@v6
         with:
           script: |
-            const del_outdate_releases = require('./scripts/del-outdate-releases');
-            del_outdate_releases({ github, context });
+            require('./scripts/del-outdate-releases')({ github, context });

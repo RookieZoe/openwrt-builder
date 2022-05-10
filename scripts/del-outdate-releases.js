@@ -6,7 +6,7 @@ module.exports = ({ github, context }) => {
     retain_days = MIN_RETAIN_DAYS;
   }
 
-  console.log(`retain_days = ${retain_days}[${typeof retain_days}]`);
+  console.log(`retain_days = ${retain_days} [${typeof retain_days}]`);
   const notafter = new Date().getTime() - retain_days * 24 * 60 * 60 * 1000;
 
   console.log('>>>>>> Listing releases');
