@@ -1,57 +1,65 @@
 config global
-	option enabled '0'
+	option enabled '1'
 	option socks_enabled '0'
-	option tcp_node 'nil'
-	option udp_node 'nil'
-	option dns_mode 'pdnsd'
-	option dns_forward '1.1.1.1'
+	option tcp_node '696cd32c1d5149ee95fd1b3accbad6df'
+	option udp_node 'tcp'
+	option dns_mode 'dns2tcp'
+	option dns_forward '8.8.8.8'
 	option filter_proxy_ipv6 '0'
 	option tcp_proxy_mode 'chnroute'
 	option udp_proxy_mode 'chnroute'
 	option localhost_tcp_proxy_mode 'default'
 	option localhost_udp_proxy_mode 'default'
-	option close_log_tcp '0'
-	option close_log_udp '0'
+	option close_log_tcp '1'
+	option close_log_udp '1'
 	option loglevel 'error'
 	option trojan_loglevel '4'
+	option dns_shunt 'dnsmasq'
+	option remote_dns '1.1.1.1'
+	option chinadns_ng '1'
 
 config global_haproxy
 	option balancing_enable '0'
 
 config global_delay
 	option auto_on '0'
-	option start_daemon '0'
+	option start_daemon '1'
 	option start_delay '1'
 
 config global_forwarding
 	option process '0'
 	option tcp_no_redir_ports 'disable'
-	option udp_no_redir_ports '80,443'
-	option tcp_redir_ports '22,25,53,143,465,587,853,993,995,80,443'
+	option udp_no_redir_ports 'disable'
+	option tcp_redir_ports '1:65535'
 	option udp_redir_ports '1:65535'
+	option tcp_proxy_drop_ports 'disable'
+	option udp_proxy_drop_ports 'disable'
+	option tcp_proxy_way 'tproxy'
 	option accept_icmp '0'
-	option tcp_proxy_way 'redirect'
 	option ipv6_tproxy '0'
+	option sniffing '1'
 
 config global_other
 	option status 'big_icon show_check_port show_ip111'
-	option nodes_ping 'auto_ping tcping'
+	option nodes_ping 'auto_ping tcping info'
 
 config global_rules
-	option auto_update '0'
 	option chnlist_update '1'
 	option chnroute_update '1'
 	option chnroute6_update '1'
 	option gfwlist_update '1'
 	option geosite_update '1'
 	option geoip_update '1'
-	list gfwlist_url 'https://cdn.jsdelivr.net/gh/Loyalsoldier/v2ray-rules-dat@release/gfw.txt'
-	list chnroute_url 'https://ispip.clang.cn/all_cn_cidr.txt'
+	option auto_update '1'
+	option week_update '6'
+	option time_update '3'
+	option v2ray_location_asset '/usr/share/xray/'
+	list gfwlist_url 'https://fastly.jsdelivr.net/gh/Loyalsoldier/v2ray-rules-dat@release/gfw.txt'
+	list chnroute_url 'https://fastly.jsdelivr.net/gh/Hackl0us/GeoIP2-CN@release/CN-ip-cidr.txt'
 	list chnroute6_url 'https://ispip.clang.cn/all_cn_ipv6.txt'
-	list chnlist_url 'https://cdn.jsdelivr.net/gh/felixonmars/dnsmasq-china-list/accelerated-domains.china.conf'
-	list chnlist_url 'https://cdn.jsdelivr.net/gh/felixonmars/dnsmasq-china-list/apple.china.conf'
-	list chnlist_url 'https://cdn.jsdelivr.net/gh/felixonmars/dnsmasq-china-list/google.china.conf'
-	option v2ray_location_asset '/usr/share/v2ray/'
+	list chnlist_url 'https://fastly.jsdelivr.net/gh/felixonmars/dnsmasq-china-list/accelerated-domains.china.conf'
+	list chnlist_url 'https://fastly.jsdelivr.net/gh/felixonmars/dnsmasq-china-list/google.china.conf'
+	list chnlist_url 'https://raw.githubusercontent.com/alecthw/chnlist/release/direct.domains.conf'
 
 config global_app
 	option v2ray_file '/usr/bin/v2ray'
@@ -353,35 +361,7 @@ geoip:private
 210.2.4.8
 101.226.4.6
 218.30.118.6
-180.76.76.76
-
-114.114.114.114
-114.114.115.115
-223.5.5.5
-223.6.6.6
-119.28.28.28
-119.29.29.29
-182.254.116.116
-1.2.4.8
-210.2.4.8
-101.226.4.6
-218.30.118.6
-180.76.76.76
-
-101.32.44.6
-
-154.204.56.29
-43.129.97.186
-193.42.25.72
-45.135.117.216
-43.226.26.146
-64.64.235.169
-
-152.70.232.221
-146.56.144.189
-168.138.212.174
-158.101.157.18
-182.254.226.238'
+180.76.76.76'
 	option domain_list 'geosite:alibaba
 domain:alicdn.com
 domain:tanx.com
@@ -414,6 +394,7 @@ domain:nutswp.com
 domain:mynj.cn
 domain:jpush.cn
 domain:vps.hosting
+domain:1gdf.com
 full:tongji.baidu.com'
 
 config shunt_rules 'BT'
