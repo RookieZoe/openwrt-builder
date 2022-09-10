@@ -1,4 +1,4 @@
-name: openwrt-21.02-aarch64
+name: openwrt-aarch64
 
 on:
   schedule:

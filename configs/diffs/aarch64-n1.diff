@@ -1,7 +1,7 @@
-diff --git a/configs/openwrt-21.02-x86_64.config b/configs/openwrt-21.02-x86_64.config
+diff --git a/configs/openwrt-x86_64.config b/configs/openwrt-x86_64.config
 index 9b5e68f..06cbb1d 100644
---- a/configs/openwrt-21.02-x86_64.config
-+++ b/configs/openwrt-21.02-x86_64.config
+--- a/configs/openwrt-x86_64.config
++++ b/configs/openwrt-x86_64.config
 @@ -1,8 +1,12 @@
 -CONFIG_TARGET_x86=y
 -CONFIG_TARGET_x86_64=y
