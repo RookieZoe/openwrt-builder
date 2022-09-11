@@ -1,5 +1,5 @@
 diff --git a/configs/openwrt-x86_64.config b/configs/openwrt-x86_64.config
-index 9b5e68f..06cbb1d 100644
+index 6c7dc95..69549cc 100644
 --- a/configs/openwrt-x86_64.config
 +++ b/configs/openwrt-x86_64.config
 @@ -1,8 +1,12 @@
@@ -20,7 +20,7 @@ index 9b5e68f..06cbb1d 100644
  CONFIG_IPTABLES_CONNLABEL=y
  CONFIG_IPTABLES_NFTABLES=y
  CONFIG_KEEPALIVED_BFD=y
-@@ -24,22 +28,41 @@ CONFIG_KEEPALIVED_SNMP_RFC3=y
+@@ -26,22 +30,41 @@ CONFIG_KEEPALIVED_SNMP_RFC3=y
  CONFIG_KEEPALIVED_SNMP_VRRP=y
  CONFIG_KEEPALIVED_VRRP=y
  CONFIG_KEEPALIVED_VRRP_AUTH=y
@@ -66,9 +66,9 @@ index 9b5e68f..06cbb1d 100644
  CONFIG_PACKAGE_chinadns-ng=y
  CONFIG_PACKAGE_coreutils=y
  CONFIG_PACKAGE_coreutils-base64=y
-@@ -50,60 +73,86 @@ CONFIG_PACKAGE_coreutils-nohup=y
- # CONFIG_PACKAGE_ddns-scripts_dnspod is not set
+@@ -53,63 +76,108 @@ CONFIG_PACKAGE_coreutils-nohup=y
  CONFIG_PACKAGE_dns2socks=y
+ CONFIG_PACKAGE_dns2tcp=y
  CONFIG_PACKAGE_dnsmasq_full_broken_rtc=y
 +CONFIG_PACKAGE_dosfstools=y
  # CONFIG_PACKAGE_dropbear is not set
@@ -98,19 +98,31 @@ index 9b5e68f..06cbb1d 100644
  CONFIG_PACKAGE_iptables-mod-nat-extra=y
 -CONFIG_PACKAGE_iptables-mod-tproxy=y
 +CONFIG_PACKAGE_iw-full=y
++CONFIG_PACKAGE_iwinfo=y
  CONFIG_PACKAGE_keepalived=y
--# CONFIG_PACKAGE_kmod-crypto-crc32c is not set
 -# CONFIG_PACKAGE_kmod-fs-antfs is not set
 -# CONFIG_PACKAGE_kmod-fs-exfat is not set
 -# CONFIG_PACKAGE_kmod-fs-ext4 is not set
 -# CONFIG_PACKAGE_kmod-fs-vfat is not set
+-CONFIG_PACKAGE_kmod-ip6tables=y
 -CONFIG_PACKAGE_kmod-ipt-compat-xtables=y
 +CONFIG_PACKAGE_kmod-b44=y
 +CONFIG_PACKAGE_kmod-brcmfmac=y
 +CONFIG_PACKAGE_kmod-brcmutil=y
 +CONFIG_PACKAGE_kmod-cfg80211=y
 +CONFIG_PACKAGE_kmod-crypto-acompress=y
++CONFIG_PACKAGE_kmod-crypto-cbc=y
++CONFIG_PACKAGE_kmod-crypto-ccm=y
++CONFIG_PACKAGE_kmod-crypto-cmac=y
 +CONFIG_PACKAGE_kmod-crypto-crc32c=y
++CONFIG_PACKAGE_kmod-crypto-ctr=y
++CONFIG_PACKAGE_kmod-crypto-gcm=y
++CONFIG_PACKAGE_kmod-crypto-gf128=y
++CONFIG_PACKAGE_kmod-crypto-ghash=y
++CONFIG_PACKAGE_kmod-crypto-hmac=y
++CONFIG_PACKAGE_kmod-crypto-rng=y
++CONFIG_PACKAGE_kmod-crypto-seqiv=y
++CONFIG_PACKAGE_kmod-crypto-sha256=y
 +CONFIG_PACKAGE_kmod-dax=y
 +CONFIG_PACKAGE_kmod-dm=y
 +CONFIG_PACKAGE_kmod-fs-btrfs=y
@@ -119,6 +131,7 @@ index 9b5e68f..06cbb1d 100644
 +CONFIG_PACKAGE_kmod-input-core=y
 +CONFIG_PACKAGE_kmod-input-evdev=y
  CONFIG_PACKAGE_kmod-ipt-conntrack-extra=y
++CONFIG_PACKAGE_kmod-ip6tables=y
  CONFIG_PACKAGE_kmod-ipt-conntrack-label=y
  CONFIG_PACKAGE_kmod-ipt-extra=y
 -CONFIG_PACKAGE_kmod-ipt-ipmark=y
@@ -132,6 +145,8 @@ index 9b5e68f..06cbb1d 100644
  CONFIG_PACKAGE_kmod-iptunnel=y
  CONFIG_PACKAGE_kmod-iptunnel4=y
 -# CONFIG_PACKAGE_kmod-lib-crc16 is not set
++CONFIG_PACKAGE_kmod-keys-encrypted=y
++CONFIG_PACKAGE_kmod-keys-trusted=y
 +CONFIG_PACKAGE_kmod-lib-crc32c=y
 +CONFIG_PACKAGE_kmod-lib-lzo=y
 +CONFIG_PACKAGE_kmod-lib-raid6=y
@@ -146,18 +161,24 @@ index 9b5e68f..06cbb1d 100644
 +CONFIG_PACKAGE_kmod-mii=y
 +CONFIG_PACKAGE_kmod-mmc=y
 +CONFIG_PACKAGE_kmod-nf-flow=y
+ CONFIG_PACKAGE_kmod-nf-ipt6=y
+ CONFIG_PACKAGE_kmod-nf-log6=y
  CONFIG_PACKAGE_kmod-nf-nat6=y
+ CONFIG_PACKAGE_kmod-nf-reject6=y
 -# CONFIG_PACKAGE_kmod-nls-cp437 is not set
 -# CONFIG_PACKAGE_kmod-nls-iso8859-1 is not set
 -# CONFIG_PACKAGE_kmod-nls-utf8 is not set
 -# CONFIG_PACKAGE_kmod-scsi-core is not set
 +CONFIG_PACKAGE_kmod-nls-base=y
 +CONFIG_PACKAGE_kmod-nls-utf8=y
++CONFIG_PACKAGE_kmod-phy-ax88796b=y
++CONFIG_PACKAGE_kmod-random-core=y
  CONFIG_PACKAGE_kmod-shortcut-fe=y
  CONFIG_PACKAGE_kmod-shortcut-fe-cm=y
  CONFIG_PACKAGE_kmod-sit=y
 +CONFIG_PACKAGE_kmod-ssb=y
  CONFIG_PACKAGE_kmod-tcp-bbr=y
++CONFIG_PACKAGE_kmod-tpm=y
  CONFIG_PACKAGE_kmod-tun=y
 -# CONFIG_PACKAGE_kmod-usb-printer is not set
 -# CONFIG_PACKAGE_kmod-usb-storage is not set
@@ -171,13 +192,14 @@ index 9b5e68f..06cbb1d 100644
 +CONFIG_PACKAGE_kmod-usb-net-asix-ax88179=y
 +CONFIG_PACKAGE_kmod-usb-ohci=y
 +CONFIG_PACKAGE_kmod-usb-uhci=y
++CONFIG_PACKAGE_kmod-usb-xhci-hcd=y
 +CONFIG_PACKAGE_kmod-usb2=y
 +CONFIG_PACKAGE_kmod-usb3=y
 +CONFIG_PACKAGE_libarchive=y
  CONFIG_PACKAGE_libatomic=y
  CONFIG_PACKAGE_libattr=y
  CONFIG_PACKAGE_libbpf=y
-@@ -111,17 +160,22 @@ CONFIG_PACKAGE_libbz2=y
+@@ -117,18 +185,23 @@ CONFIG_PACKAGE_libbz2=y
  CONFIG_PACKAGE_libcap=y
  # CONFIG_PACKAGE_libcap-ng is not set
  CONFIG_PACKAGE_libcares=y
@@ -188,6 +210,7 @@ index 9b5e68f..06cbb1d 100644
 +CONFIG_PACKAGE_libfdisk=y
  CONFIG_PACKAGE_libffi=y
 -CONFIG_PACKAGE_libipset=y
+ CONFIG_PACKAGE_libkmod=y
  CONFIG_PACKAGE_libltdl=y
  CONFIG_PACKAGE_liblua5.3=y
  CONFIG_PACKAGE_liblzma=y
@@ -201,9 +224,11 @@ index 9b5e68f..06cbb1d 100644
  CONFIG_PACKAGE_libnetsnmp=y
  CONFIG_PACKAGE_libnftnl=y
  CONFIG_PACKAGE_libnl-core=y
-@@ -130,13 +184,18 @@ CONFIG_PACKAGE_libnl-route=y
+@@ -136,14 +209,21 @@ CONFIG_PACKAGE_libnl-genl=y
+ CONFIG_PACKAGE_libnl-route=y
  # CONFIG_PACKAGE_libopenssl-conf is not set
  CONFIG_PACKAGE_libpam=y
++CONFIG_PACKAGE_libparted=y
  CONFIG_PACKAGE_libpci=y
 +CONFIG_PACKAGE_libreadline=y
 +CONFIG_PACKAGE_libsmartcols=y
@@ -211,7 +236,7 @@ index 9b5e68f..06cbb1d 100644
  CONFIG_PACKAGE_libstdcpp=y
 -CONFIG_PACKAGE_libtirpc=y
  CONFIG_PACKAGE_libudns=y
--CONFIG_PACKAGE_libuv=y
+ CONFIG_PACKAGE_libuv=y
  CONFIG_PACKAGE_libwebsockets-full=y
 +CONFIG_PACKAGE_libzstd=y
 +CONFIG_PACKAGE_losetup=y
@@ -222,18 +247,19 @@ index 9b5e68f..06cbb1d 100644
  CONFIG_PACKAGE_luci-app-arpbind=y
  # CONFIG_PACKAGE_luci-app-control-timewol is not set
  # CONFIG_PACKAGE_luci-app-control-webrestriction is not set
-@@ -152,10 +211,8 @@ CONFIG_PACKAGE_luci-app-passwall_INCLUDE_Hysteria=y
+@@ -159,11 +239,9 @@ CONFIG_PACKAGE_luci-app-passwall_INCLUDE_Hysteria=y
  CONFIG_PACKAGE_luci-app-passwall_INCLUDE_IPv6_Nat=y
  CONFIG_PACKAGE_luci-app-passwall_INCLUDE_NaiveProxy=y
  CONFIG_PACKAGE_luci-app-passwall_INCLUDE_ShadowsocksR_Libev_Server=y
 -CONFIG_PACKAGE_luci-app-passwall_INCLUDE_Shadowsocks_Rust_Client=y
+ CONFIG_PACKAGE_luci-app-passwall_INCLUDE_Shadowsocks_Rust_Server=y
  CONFIG_PACKAGE_luci-app-passwall_INCLUDE_Trojan_GO=y
  CONFIG_PACKAGE_luci-app-passwall_INCLUDE_Xray_Plugin=y
 -# CONFIG_PACKAGE_luci-app-samba is not set
  CONFIG_PACKAGE_luci-app-smartdns=y
  # CONFIG_PACKAGE_luci-app-timecontrol is not set
  CONFIG_PACKAGE_luci-app-ttyd=y
-@@ -163,10 +220,9 @@ CONFIG_PACKAGE_luci-app-turboacc=y
+@@ -171,10 +249,9 @@ CONFIG_PACKAGE_luci-app-turboacc=y
  # CONFIG_PACKAGE_luci-app-unblockmusic_INCLUDE_UnblockNeteaseMusic_Go is not set
  # CONFIG_PACKAGE_luci-app-unblockmusic_INCLUDE_UnblockNeteaseMusic_NodeJS is not set
  # CONFIG_PACKAGE_luci-app-upnp is not set
@@ -245,7 +271,7 @@ index 9b5e68f..06cbb1d 100644
  CONFIG_PACKAGE_luci-i18n-arpbind-zh-cn=y
  CONFIG_PACKAGE_luci-i18n-base-en=y
  CONFIG_PACKAGE_luci-i18n-firewall-en=y
-@@ -178,22 +234,58 @@ CONFIG_PACKAGE_luci-i18n-ttyd-en=y
+@@ -186,22 +263,59 @@ CONFIG_PACKAGE_luci-i18n-ttyd-en=y
  CONFIG_PACKAGE_luci-i18n-ttyd-zh-cn=y
  CONFIG_PACKAGE_luci-i18n-turboacc-zh-cn=y
  CONFIG_PACKAGE_luci-i18n-zerotier-zh-cn=y
@@ -253,6 +279,7 @@ index 9b5e68f..06cbb1d 100644
  # CONFIG_PACKAGE_luci-lib-ipkg is not set
  CONFIG_PACKAGE_microsocks=y
  # CONFIG_PACKAGE_miniupnpd is not set
++# CONFIG_PACKAGE_miniupnpd-nftables is not set
  CONFIG_PACKAGE_naiveproxy=y
  CONFIG_PACKAGE_netdata=y
 -CONFIG_PACKAGE_open-vm-tools=y
@@ -307,7 +334,7 @@ index 9b5e68f..06cbb1d 100644
  CONFIG_PACKAGE_shadowsocks-libev-ss-local=y
  CONFIG_PACKAGE_shadowsocks-libev-ss-redir=y
  CONFIG_PACKAGE_shadowsocks-libev-ss-server=y
-@@ -203,24 +295,40 @@ CONFIG_PACKAGE_shadowsocksr-libev-ssr-redir=y
+@@ -212,24 +326,40 @@ CONFIG_PACKAGE_shadowsocksr-libev-ssr-redir=y
  CONFIG_PACKAGE_shadowsocksr-libev-ssr-server=y
  CONFIG_PACKAGE_simple-obfs=y
  CONFIG_PACKAGE_smartdns=y

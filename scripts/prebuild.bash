@@ -81,8 +81,8 @@ prepare_configs() {
     git apply configs/diffs/x64-samba4.diff
     ;;
   'aarch64')
-    git apply --check configs/diffs/aarch64-n1.diff
-    git apply configs/diffs/aarch64-n1.diff
+    git apply --check configs/diffs/aarch64-arm8.diff
+    git apply configs/diffs/aarch64-arm8.diff
     ;;
   esac
 
