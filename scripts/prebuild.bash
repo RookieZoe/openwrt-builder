@@ -28,16 +28,13 @@ prepare_codes_feeds() {
   } >>"$GITHUB_WORKSPACE/openwrt/feeds.conf.default"
 
   # replace release info
-  sed -i -e '/exit 0/d' "$GITHUB_WORKSPACE/openwrt/package/default-settings/files/zzz-default-settings"
   {
-    echo "sed -i '/BUILD_ID=/d' /usr/lib/os-release"
-    echo "sed -i '/DISTRIB_REVISION=/d' /etc/openwrt_release"
-    echo "sed -i '/DISTRIB_DESCRIPTION=/d' /etc/openwrt_release"
+    cat "$GITHUB_WORKSPACE/configs/zzz-default-settings"
     echo "echo \"BUILD_ID=$R_VERSION\" >> /usr/lib/os-release"
     echo "echo \"DISTRIB_REVISION='$R_VERSION'\" >> /etc/openwrt_release"
     echo "echo \"DISTRIB_DESCRIPTION='$R_DESCRIPTION'\" >> /etc/openwrt_release"
     echo "exit 0"
-  } >>"$GITHUB_WORKSPACE/openwrt/package/default-settings/files/zzz-default-settings"
+  } >"$GITHUB_WORKSPACE/openwrt/package/default-settings/files/zzz-default-settings"
 
   cd "$GITHUB_WORKSPACE/openwrt/"
 
