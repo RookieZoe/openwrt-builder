@@ -18,4 +18,6 @@ n1 packing: [unifreq/openwrt_packit](https://github.com/unifreq/openwrt_packit)
 
 ### luci app && package list
 
+**重要：使用 Release v22.09.22 之前固件安装的系统，在使用 img.gz 包更新系统之前，请仔细阅读 wiki**
+
 见 [wiki](https://github.com/RookieZoe/openwrt-builder/wiki)

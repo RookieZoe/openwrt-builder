@@ -23,7 +23,7 @@ sed -i '/lienol/d' /etc/opkg/distfeeds.conf
 sed -i '/other/d' /etc/opkg/distfeeds.conf
 sed -i "s/# //g" /etc/opkg/distfeeds.conf
 
-# set network only once at first boot after install
+# set dhcp only once at first boot after install
 if [[ ! $(uci show dhcp._set_done) ]]; then
   uci delete dhcp.lan.ra
   uci delete dhcp.lan.dhcpv6
