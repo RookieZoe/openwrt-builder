@@ -23,25 +23,33 @@ sed -i '/lienol/d' /etc/opkg/distfeeds.conf
 sed -i '/other/d' /etc/opkg/distfeeds.conf
 sed -i "s/# //g" /etc/opkg/distfeeds.conf
 
-uci delete dhcp.lan.ra
-uci delete dhcp.lan.dhcpv6
-uci delete dhcp.lan.ndp
-uci set dhcp.lan=dhcp
-uci set dhcp.lan.interface='lan'
-uci set dhcp.lan.ignore='1'
-uci set dhcp.wan=dhcp
-uci set dhcp.wan.interface='wan'
-uci set dhcp.wan.ignore='1'
-uci commit dhcp
+# set network only once at first boot after install
+if [[ ! $(uci show dhcp._set_done) ]]; then
+  uci delete dhcp.lan.ra
+  uci delete dhcp.lan.dhcpv6
+  uci delete dhcp.lan.ndp
+  uci set dhcp.lan=dhcp
+  uci set dhcp.lan.interface='lan'
+  uci set dhcp.lan.ignore='1'
+  uci set dhcp.wan=dhcp
+  uci set dhcp.wan.interface='wan'
+  uci set dhcp.wan.ignore='1'
+  uci set dhcp._set_done='1'
+  uci commit dhcp
+fi
 
-uci delete network.lan
-uci set network.lan=interface
-uci set network.lan._orig_ifname='eth0'
-uci set network.lan._orig_bridge='false'
-uci set network.lan.device='eth0'
-uci set network.lan.proto='dhcp'
-uci set network.lan.ip6assign='64'
-uci commit network
+# set network only once at first boot after install
+if [[ ! $(uci show network.lan._set_done) ]]; then
+  uci delete network.lan
+  uci set network.lan=interface
+  uci set network.lan._orig_ifname='eth0'
+  uci set network.lan._orig_bridge='false'
+  uci set network.lan.device='eth0'
+  uci set network.lan.proto='dhcp'
+  uci set network.lan.ip6assign='64'
+  uci set network.lan._set_done='1'
+  uci commit network
+fi
 
 sed -i '/option disabled/d' /etc/config/wireless
 sed -i '/set wireless.radio${devidx}.disabled/d' /lib/wifi/mac80211.sh
