@@ -11,6 +11,7 @@ R_VERSION=$(date +'v%y.%m.%d')
 R_DESCRIPTION="OpenWrt $R_VERSION Build by Rookie_Zoe"
 GITHUB_WORKSPACE=${GITHUB_WORKSPACE:-$WORK_DIR}
 OPENWRT_CONFIG_FILE="$GITHUB_WORKSPACE/configs/openwrt-x86_64.config"
+OPENWRT_BRANCH="master"
 
 BUILD_TARGET=$1
 REBUILD_FLAG=$2
@@ -18,7 +19,7 @@ REBUILD_FLAG=$2
 prepare_codes_feeds() {
   # pull openwrt source code
   rm -rf "$GITHUB_WORKSPACE/openwrt"
-  git clone -b 22.03 --single-branch https://github.com/Lienol/openwrt.git "$GITHUB_WORKSPACE/openwrt"
+  git clone -b "$OPENWRT_BRANCH" --single-branch https://github.com/Lienol/openwrt.git "$GITHUB_WORKSPACE/openwrt"
 
   {
     echo ""
@@ -52,7 +53,11 @@ prepare_codes_feeds() {
   sed -i 's/940px/1100px/g' "$LUCI_THEME_BOOTSTRAP_FILE"
   cat "$GITHUB_WORKSPACE/configs/luci-theme-bootstrap/cascade.css" >>"$LUCI_THEME_BOOTSTRAP_FILE"
 
-  # set passwall rules
+  # make luci-app-ttyd height fit window
+  LUCI_TTYD_TERMJS="$GITHUB_WORKSPACE/openwrt/feeds/luci/applications/luci-app-ttyd/htdocs/luci-static/resources/view/ttyd/term.js"
+  sed -i 's/500px/calc(100vh - 173px)/g' "$LUCI_TTYD_TERMJS"
+
+  # set luci-app-passwall rules
   TARGET_PASSWALL_CONFIG="$GITHUB_WORKSPACE/openwrt/feeds/diy2/luci-app-passwall/root/usr/share/passwall/"
   cat "$GITHUB_WORKSPACE/configs/pw-rules/0_default_config" >"$TARGET_PASSWALL_CONFIG/0_default_config"
   cat "$GITHUB_WORKSPACE/configs/pw-rules/block_host" >"$TARGET_PASSWALL_CONFIG/rules/block_host"
