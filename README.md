@@ -2,7 +2,7 @@
 
 build custom openwrt with github actions
 
-## lienol/openwrt@22.03
+## lienol/openwrt@21.02
 
 [![x86_64](https://img.shields.io/github/workflow/status/RookieZoe/openwrt-builder/openwrt-x86_64?color=34d058&label=x86_64&logo=github&logoColor=fff)](https://github.com/RookieZoe/openwrt-builder/actions/workflows/openwrt-x86_64.yml)
 
