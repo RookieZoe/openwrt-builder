@@ -7,11 +7,15 @@ WORK_DIR=$(
   pwd
 )
 
+GITHUB_WORKSPACE=${GITHUB_WORKSPACE:-$WORK_DIR}
+
 R_VERSION=$(date +'v%y.%m.%d')
 R_DESCRIPTION="OpenWrt $R_VERSION Build by Rookie_Zoe"
-GITHUB_WORKSPACE=${GITHUB_WORKSPACE:-$WORK_DIR}
-OPENWRT_CONFIG_FILE="$GITHUB_WORKSPACE/configs/openwrt-x86_64.config"
+OPENWRT_SOURCE="https://github.com/Lienol/openwrt.git"
 OPENWRT_BRANCH="21.02"
+
+PUB_CONF_PATH="$GITHUB_WORKSPACE/public"
+ARCH_CONF_PATH="$GITHUB_WORKSPACE/configs"
 
 BUILD_TARGET=$1
 REBUILD_FLAG=$2
@@ -19,7 +23,7 @@ REBUILD_FLAG=$2
 prepare_codes_feeds() {
   # pull openwrt source code
   rm -rf "$GITHUB_WORKSPACE/openwrt"
-  git clone -b "$OPENWRT_BRANCH" --single-branch https://github.com/Lienol/openwrt.git "$GITHUB_WORKSPACE/openwrt"
+  git clone -b "$OPENWRT_BRANCH" --single-branch "$OPENWRT_SOURCE" "$GITHUB_WORKSPACE/openwrt"
 
   {
     echo ""
@@ -30,7 +34,7 @@ prepare_codes_feeds() {
 
   # replace release info
   {
-    cat "$GITHUB_WORKSPACE/configs/zzz-default-settings"
+    cat "$PUB_CONF_PATH/zzz-default-settings"
     echo "echo \"BUILD_ID=$R_VERSION\" >> /usr/lib/os-release"
     echo "echo \"DISTRIB_REVISION='$R_VERSION'\" >> /etc/openwrt_release"
     echo "echo \"DISTRIB_DESCRIPTION='$R_DESCRIPTION'\" >> /etc/openwrt_release"
@@ -51,7 +55,7 @@ prepare_codes_feeds() {
   # fix some luci-theme-bootstrap style issue
   LUCI_THEME_BOOTSTRAP_FILE="$GITHUB_WORKSPACE/openwrt/feeds/luci/themes/luci-theme-bootstrap/htdocs/luci-static/bootstrap/cascade.css"
   sed -i 's/940px/1100px/g' "$LUCI_THEME_BOOTSTRAP_FILE"
-  cat "$GITHUB_WORKSPACE/configs/luci-theme-bootstrap/cascade.css" >>"$LUCI_THEME_BOOTSTRAP_FILE"
+  cat "$PUB_CONF_PATH/luci-theme-bootstrap/cascade.css" >>"$LUCI_THEME_BOOTSTRAP_FILE"
 
   # make luci-app-ttyd height fit window
   LUCI_TTYD_TERMJS="$GITHUB_WORKSPACE/openwrt/feeds/luci/applications/luci-app-ttyd/htdocs/luci-static/resources/view/ttyd/term.js"
@@ -59,15 +63,15 @@ prepare_codes_feeds() {
 
   # set luci-app-passwall rules
   TARGET_PASSWALL_CONFIG="$GITHUB_WORKSPACE/openwrt/feeds/diy2/luci-app-passwall/root/usr/share/passwall/"
-  cat "$GITHUB_WORKSPACE/configs/pw-rules/0_default_config" >"$TARGET_PASSWALL_CONFIG/0_default_config"
-  cat "$GITHUB_WORKSPACE/configs/pw-rules/block_host" >"$TARGET_PASSWALL_CONFIG/rules/block_host"
-  cat "$GITHUB_WORKSPACE/configs/pw-rules/block_ip" >"$TARGET_PASSWALL_CONFIG/rules/block_ip"
-  cat "$GITHUB_WORKSPACE/configs/pw-rules/direct_host" >"$TARGET_PASSWALL_CONFIG/rules/direct_host"
-  cat "$GITHUB_WORKSPACE/configs/pw-rules/direct_ip" >"$TARGET_PASSWALL_CONFIG/rules/direct_ip"
-  cat "$GITHUB_WORKSPACE/configs/pw-rules/lanlist_ipv4" >"$TARGET_PASSWALL_CONFIG/rules/lanlist_ipv4"
-  cat "$GITHUB_WORKSPACE/configs/pw-rules/lanlist_ipv6" >"$TARGET_PASSWALL_CONFIG/rules/lanlist_ipv6"
-  cat "$GITHUB_WORKSPACE/configs/pw-rules/proxy_host" >"$TARGET_PASSWALL_CONFIG/rules/proxy_host"
-  cat "$GITHUB_WORKSPACE/configs/pw-rules/proxy_ip" >"$TARGET_PASSWALL_CONFIG/rules/proxy_ip"
+  cat "$PUB_CONF_PATH/pw-rules/0_default_config" >"$TARGET_PASSWALL_CONFIG/0_default_config"
+  cat "$PUB_CONF_PATH/pw-rules/block_host" >"$TARGET_PASSWALL_CONFIG/rules/block_host"
+  cat "$PUB_CONF_PATH/pw-rules/block_ip" >"$TARGET_PASSWALL_CONFIG/rules/block_ip"
+  cat "$PUB_CONF_PATH/pw-rules/direct_host" >"$TARGET_PASSWALL_CONFIG/rules/direct_host"
+  cat "$PUB_CONF_PATH/pw-rules/direct_ip" >"$TARGET_PASSWALL_CONFIG/rules/direct_ip"
+  cat "$PUB_CONF_PATH/pw-rules/lanlist_ipv4" >"$TARGET_PASSWALL_CONFIG/rules/lanlist_ipv4"
+  cat "$PUB_CONF_PATH/pw-rules/lanlist_ipv6" >"$TARGET_PASSWALL_CONFIG/rules/lanlist_ipv6"
+  cat "$PUB_CONF_PATH/pw-rules/proxy_host" >"$TARGET_PASSWALL_CONFIG/rules/proxy_host"
+  cat "$PUB_CONF_PATH/pw-rules/proxy_ip" >"$TARGET_PASSWALL_CONFIG/rules/proxy_ip"
 
   # feeds install
   ./scripts/feeds install -a
@@ -77,26 +81,15 @@ prepare_configs() {
   cd "$GITHUB_WORKSPACE"
   git checkout ./
 
-  case "$BUILD_TARGET" in
-  'x64-samba4')
-    git apply --check configs/diffs/x64-samba4.diff
-    git apply configs/diffs/x64-samba4.diff
-    ;;
-  'aarch64')
-    git apply --check configs/diffs/aarch64-arm8.diff
-    git apply configs/diffs/aarch64-arm8.diff
-    ;;
-  esac
-
   cd "$GITHUB_WORKSPACE/openwrt/"
   rm -rf "$GITHUB_WORKSPACE/openwrt/bin/targets/"
   rm -f "$GITHUB_WORKSPACE/openwrt/.config"
   rm -f "$GITHUB_WORKSPACE/openwrt/.config.old"
 
-  echo "Read config $OPENWRT_CONFIG_FILE > $GITHUB_WORKSPACE/openwrt/.config"
-  cat "$OPENWRT_CONFIG_FILE" >"$GITHUB_WORKSPACE/openwrt/.config"
+  echo "Read config $1 > $GITHUB_WORKSPACE/openwrt/.config"
+  cat "$1" >"$GITHUB_WORKSPACE/openwrt/.config"
   {
-    cat "$GITHUB_WORKSPACE/configs/release-info.config"
+    cat "$PUB_CONF_PATH/release-info.config"
     echo ""
     echo "CONFIG_VERSION_NUMBER=\"$(date +'v%y.%m.%d')\""
     echo ""
@@ -108,17 +101,27 @@ prepare_configs() {
 
 echo "GITHUB_WORKSPACE=$GITHUB_WORKSPACE"
 
-if [ -z "$OPENWRT_CONFIG_FILE" ]; then
-  echo "OPENWRT_CONFIG_FILE not provide"
+ARCH_CONF_FILE="$ARCH_CONF_PATH/x64.config"
+case "$BUILD_TARGET" in
+'x64-samba4')
+  ARCH_CONF_FILE="$ARCH_CONF_PATH/x64_samba.config"
+  ;;
+'aarch64')
+  ARCH_CONF_FILE="$ARCH_CONF_PATH/arm8.config"
+  ;;
+esac
+
+if [ -z "$ARCH_CONF_FILE" ]; then
+  echo "ARCH_CONF_FILE not provide"
   exit 1
 fi
 
-echo "OPENWRT_CONFIG_FILE=$OPENWRT_CONFIG_FILE"
+echo "ARCH_CONF_FILE=$ARCH_CONF_FILE"
 
 if [ "$REBUILD_FLAG" != "REBUILD" ]; then
   prepare_codes_feeds
 fi
 
-prepare_configs
+prepare_configs "$ARCH_CONF_FILE"
 
 exit 0
