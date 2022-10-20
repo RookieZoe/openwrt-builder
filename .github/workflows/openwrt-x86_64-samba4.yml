@@ -39,6 +39,11 @@ jobs:
         if: success()
         run: |
           bash $GITHUB_WORKSPACE/scripts/packup.bash $BUILD_TARGET
+          cd $GITHUB_WORKSPACE/out/
+          touch ./openwrt-x86-64_samba4.sha256sum
+          find ./ -follow -type f -name "openwrt_*.gz" -print | while read -r img; do
+            sha256sum "$img" >> ./openwrt-x86-64_samba4.sha256sum
+          done
           tree $GITHUB_WORKSPACE/out/
 
       - name: 4-1 Upload targets to release
