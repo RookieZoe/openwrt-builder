@@ -46,6 +46,10 @@ prepare_codes_feeds() {
   # feeds update
   ./scripts/feeds update -a
 
+  # replace feeds/packages/net/xray-core with feeds/diy1/xray-core
+  rm -rf feeds/packages/net/xray-core
+  cp -r feeds/diy1/xray-core feeds/packages/net
+
   # fix luci modal pannel style issue
   LUCI_HEADER_FILE="$GITHUB_WORKSPACE/openwrt/feeds/luci/modules/luci-base/luasrc/view/header.htm"
   LUCI_HEADER_STYLE_BEGIN=$(cat "$LUCI_HEADER_FILE" | grep -n "<style>" | awk -F ":" '{print $1}')
