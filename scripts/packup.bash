@@ -11,16 +11,16 @@ PACK_TARGET=$1
 GITHUB_WORKSPACE=${GITHUB_WORKSPACE:-$WORK_DIR}
 
 TARGET_DIR="$GITHUB_WORKSPACE/openwrt/bin/targets/"
-OP_TARGET_NAME=openwrt-x86-64-generic-squashfs-combined.img.gz
+OP_TARGET_NAME=openwrt-x86-64-generic-squashfs-combined-efi.img.gz
 
 OUT_DIR="$GITHUB_WORKSPACE/out/"
-OP_OUT_NAME=openwrt-x86-64-generic-squashfs-combined.img.gz
+OP_OUT_NAME=openwrt-x86-64-generic-squashfs-combined-efi.img.gz
 OP_OUT_TARBALL=openwrt-x86-64-generic_packages.tar.gz
 
 case "$PACK_TARGET" in
 'x64-samba4')
-  OP_TARGET_NAME=openwrt-x86-64-generic-squashfs-combined.img.gz
-  OP_OUT_NAME=openwrt-x86-64-generic-squashfs-combined_samba4.img.gz
+  OP_TARGET_NAME=openwrt-x86-64-generic-squashfs-combined-efi.img.gz
+  OP_OUT_NAME=openwrt-x86-64-generic-squashfs-combined-efi_samba4.img.gz
   OP_OUT_TARBALL=openwrt-x86-64-generic_packages_samba4.tar.gz
   ;;
 'aarch64')

@@ -7,26 +7,38 @@ WORK_DIR=$(
   pwd
 )
 
+BUILD_TARGET=$1
+REBUILD_FLAG=$2
+
 GITHUB_WORKSPACE=${GITHUB_WORKSPACE:-$WORK_DIR}
 
 R_VERSION=$(date +'v%y.%m.%d')
 R_DESCRIPTION="OpenWrt $R_VERSION Build by Rookie_Zoe"
 OPENWRT_SOURCE="https://github.com/Lienol/openwrt.git"
-OPENWRT_BRANCH="21.02"
+OPENWRT_BRANCH="master"
+
+case "$BUILD_TARGET" in
+'x64-samba4')
+  OPENWRT_BRANCH="21.02"
+  ;;
+'aarch64')
+  OPENWRT_BRANCH="master"
+  ;;
+esac
 
 PUB_CONF_PATH="$GITHUB_WORKSPACE/public"
 ARCH_CONF_PATH="$GITHUB_WORKSPACE/configs"
-
-BUILD_TARGET=$1
-REBUILD_FLAG=$2
 
 prepare_codes_feeds() {
   # pull openwrt source code
   rm -rf "$GITHUB_WORKSPACE/openwrt"
   git clone -b "$OPENWRT_BRANCH" --single-branch "$OPENWRT_SOURCE" "$GITHUB_WORKSPACE/openwrt"
 
+  # replace luci:21.02 with luci:17.01-dev
+  sed -i -e '/openwrt-luci.git;/d' "$GITHUB_WORKSPACE/openwrt/feeds.conf.default"
   {
     echo ""
+    echo "src-git luci https://github.com/Lienol/openwrt-luci.git;21.02"
     echo "src-git diy1 https://github.com/xiaorouji/openwrt-passwall.git;packages"
     echo "src-git diy2 https://github.com/xiaorouji/openwrt-passwall.git;luci"
     echo "src-git amlogic https://github.com/ophub/luci-app-amlogic.git;main"
