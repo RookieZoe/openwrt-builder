@@ -308,7 +308,8 @@ full:d27xxe7juh1us6.cloudfront.net
 domain:vmware.com
 domain:mikrotik.com
 domain:mt.lv
-full:mirror.csclub.uwaterloo.ca'
+full:mirror.csclub.uwaterloo.ca
+domain:openai.com'
 
 config shunt_rules 'OTHER_PROXY'
 	option remarks '其他代理'
