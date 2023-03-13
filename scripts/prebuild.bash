@@ -15,19 +15,19 @@ GITHUB_WORKSPACE=${GITHUB_WORKSPACE:-$WORK_DIR}
 R_VERSION=$(date +'v%y.%m.%d')
 R_DESCRIPTION="OpenWrt $R_VERSION Build by Rookie_Zoe"
 OPENWRT_SOURCE="https://github.com/Lienol/openwrt.git"
-OPENWRT_BRANCH="master"
+OPENWRT_BRANCH="22.03"
 PASSWALL_BRANCH="luci-smartdns-new-version"
 
-case "$BUILD_TARGET" in
-'x64-samba4')
-  OPENWRT_BRANCH="21.02"
-  PASSWALL_BRANCH="luci"
-  ;;
-'aarch64')
-  OPENWRT_BRANCH="master"
-  PASSWALL_BRANCH="luci-smartdns-new-version"
-  ;;
-esac
+# case "$BUILD_TARGET" in
+# 'x64-samba4')
+#   OPENWRT_BRANCH="21.02"
+#   PASSWALL_BRANCH="luci"
+#   ;;
+# 'aarch64')
+#   OPENWRT_BRANCH="22.03"
+#   PASSWALL_BRANCH="luci-smartdns-new-version"
+#   ;;
+# esac
 
 PUB_CONF_PATH="$GITHUB_WORKSPACE/public"
 ARCH_CONF_PATH="$GITHUB_WORKSPACE/configs"
@@ -39,11 +39,11 @@ prepare_codes_feeds() {
   git clone -b "$OPENWRT_BRANCH" --single-branch "$OPENWRT_SOURCE" "$GITHUB_WORKSPACE/openwrt"
 
   # replace luci:21.02 with luci:17.01-dev
-  echo ">>>>>>>>>>>>>>>>> replace luci:21.02 with luci:17.01-dev"
-  sed -i -e '/openwrt-luci.git;/d' "$GITHUB_WORKSPACE/openwrt/feeds.conf.default"
+  # echo ">>>>>>>>>>>>>>>>> replace luci:21.02 with luci:17.01-dev"
+  # sed -i -e '/openwrt-luci.git;/d' "$GITHUB_WORKSPACE/openwrt/feeds.conf.default"
   {
     echo ""
-    echo "src-git luci https://github.com/Lienol/openwrt-luci.git;21.02"
+    # echo "src-git luci https://github.com/Lienol/openwrt-luci.git;21.02"
     echo "src-git diy1 https://github.com/xiaorouji/openwrt-passwall.git;packages"
     echo "src-git diy2 https://github.com/xiaorouji/openwrt-passwall.git;$PASSWALL_BRANCH"
     echo "src-git amlogic https://github.com/ophub/luci-app-amlogic.git;main"
@@ -84,9 +84,9 @@ prepare_codes_feeds() {
   cat "$PUB_CONF_PATH/luci-theme-bootstrap/cascade.css" >>"$LUCI_THEME_BOOTSTRAP_FILE"
 
   # fix some luci-app-smartdns issue
-  if [ "$BUILD_TARGET" != "x64-samba4" ]; then
-    wget https://github.com/openwrt/luci/raw/openwrt-22.03/applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js -O "$GITHUB_WORKSPACE/openwrt/feeds/luci/applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js"
-  fi
+  # if [ "$BUILD_TARGET" != "x64-samba4" ]; then
+  #   wget https://github.com/openwrt/luci/raw/openwrt-22.03/applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js -O "$GITHUB_WORKSPACE/openwrt/feeds/luci/applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js"
+  # fi
 
   # make luci-app-ttyd height fit window
   echo ">>>>>>>>>>>>>>>>> make luci-app-ttyd height fit window"
@@ -138,9 +138,6 @@ echo "GITHUB_WORKSPACE=$GITHUB_WORKSPACE"
 
 ARCH_CONF_FILE="$ARCH_CONF_PATH/x64.config"
 case "$BUILD_TARGET" in
-'x64-samba4')
-  ARCH_CONF_FILE="$ARCH_CONF_PATH/x64_samba.config"
-  ;;
 'aarch64')
   ARCH_CONF_FILE="$ARCH_CONF_PATH/arm8.config"
   ;;
