@@ -1,0 +1,35 @@
+
+config shunt_rules 'OTHER_PROXY_HK'
+	option remarks '其他代理_HK'
+	option domain_list 'domain:tvtime.com
+domain:readdle.com
+domain:tozelabs.com
+domain:apptimize.com
+domain:ghcr.io
+domain:githubmemory.com
+domain:githubusercontent.com
+full:vowwm3n619.execute-api.eu-west-1.amazonaws.com
+
+domain:caddyserver.com
+domain:xnyhui.top
+domain:solanium.io
+domain:projectserum.com
+domain:chpok.pw
+
+domain:byteoversea.com
+domain:innos.io
+
+domain:tntv2.xyz
+domain:segment.com
+domain:commscope.com
+domain:gushiciku.cn
+
+domain:cloudflareinsights.com
+domain:clearbitjs.com
+domain:clearbit.com
+domain:amplitude.com
+domain:adsymptotic.com
+domain:datadoghq.com
+domain:gist.github.com
+domain:rutracker.org
+domain:licloud.io'

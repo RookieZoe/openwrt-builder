@@ -1,0 +1,4 @@
+
+config shunt_rules 'BT'
+	option remarks 'BT'
+	option protocol 'bittorrent'

@@ -1,0 +1,42 @@
+
+config shunt_rules 'OTHER_PROXY_US'
+	option remarks '其他代理_US'
+	option domain_list 'geosite:rarbg
+geosite:yandex
+
+domain:vmware.com
+domain:mikrotik.com
+domain:mt.lv
+
+full:mirror.csclub.uwaterloo.ca
+domain:openai.com
+
+onedrive
+office365
+domain:msauth.net
+domain:msftauth.net
+domain:clarity.com
+domain:clarity.ms
+domain:azure.com
+domain:fabric.io
+domain:files.1drv.com
+domain:hotmail.com
+domain:live.com
+domain:live.net
+domain:livefilestore.com
+domain:bing.com
+domain:mesh.com
+domain:microsoft.com
+domain:microsoftonline.com
+domain:microsoft-tst.com
+domain:msn.com
+domain:office.com
+domain:office.net
+domain:onedrive.com
+domain:outlook.com
+domain:p.sfx.ms
+domain:s-microsoft.com
+domain:sharepoint.com
+domain:skype.com
+domain:spoprod-a.akamaihd.net
+domain:storage.msn.com'

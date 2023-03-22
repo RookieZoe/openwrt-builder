@@ -1,0 +1,46 @@
+
+config shunt_rules 'US_STREAM'
+	option remarks '欧美流媒体'
+	option domain_list 'geosite:youtube
+
+geosite:hbo
+geosite:hulu
+geosite:twitch
+
+domain:tv.apple.com
+full:hls.itunes.apple.com
+full:hls-amt.itunes.apple.com
+full:play-edge.itunes.apple.com
+full:xp.apple.com
+full:xp-daf.itunes-apple.com.akadns.net
+full:xp-daf.apple.com.edgekey.net
+full:hls-svod-aoc-ve.itunes.g.aaplimg.com
+
+avoddashs
+domain:aiv-cdn.net
+domain:aiv-delivery.net
+domain:amazon.fr
+domain:amazon.de
+domain:amazon.com
+domain:amazon.co.jp
+domain:amazon.co.uk
+domain:amazonvideo.cc
+domain:amazonvideo.com
+domain:amazonprimevideos.com
+domain:media-amazon.com
+domain:primevideo.cc
+domain:primevideo.com
+domain:primevideo.info
+domain:primevideo.org
+domain:primevideo.tv
+domain:prime-video.com
+domain:ssl-images-amazon.com
+full:atv-ps.amazon.com
+full:fls-na.amazon.com
+full:avodmp4s3ww-a.akamaihd.net
+full:d25xi40x97liuc.cloudfront.net
+full:dmqdd6hw24ucf.cloudfront.net
+full:dmqdd6hw24ucf.cloudfront.net
+full:d22qjgkvxw22r6.cloudfront.net
+full:d1v5ir2lpwr8os.cloudfront.net
+full:d27xxe7juh1us6.cloudfront.net'

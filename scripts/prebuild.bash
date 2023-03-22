@@ -96,7 +96,7 @@ prepare_codes_feeds() {
   # set luci-app-passwall rules
   echo ">>>>>>>>>>>>>>>>> set luci-app-passwall rules"
   TARGET_PASSWALL_CONFIG="$GITHUB_WORKSPACE/openwrt/feeds/diy2/luci-app-passwall/root/usr/share/passwall/"
-  cat "$PUB_CONF_PATH/pw-rules/0_default_config" >"$TARGET_PASSWALL_CONFIG/0_default_config"
+  cat "$PUB_CONF_PATH/pw-rules/0_default_config/"* >"$TARGET_PASSWALL_CONFIG/0_default_config"
   cat "$PUB_CONF_PATH/pw-rules/block_host" >"$TARGET_PASSWALL_CONFIG/rules/block_host"
   cat "$PUB_CONF_PATH/pw-rules/block_ip" >"$TARGET_PASSWALL_CONFIG/rules/block_ip"
   cat "$PUB_CONF_PATH/pw-rules/direct_host" >"$TARGET_PASSWALL_CONFIG/rules/direct_host"
