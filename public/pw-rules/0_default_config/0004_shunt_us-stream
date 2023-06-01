@@ -2,6 +2,8 @@
 config shunt_rules 'US_STREAM'
 	option remarks '欧美流媒体'
 	option domain_list 'geosite:youtube
+domain:youtube.com
+domain:tidal.com
 
 geosite:hbo
 geosite:hulu
