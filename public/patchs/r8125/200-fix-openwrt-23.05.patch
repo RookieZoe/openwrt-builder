@@ -1,0 +1,14 @@
+diff --git a/src/Makefile b/src/Makefile
+index ed8e922..7f53191 100755
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -50,6 +50,9 @@ ENABLE_USE_FIRMWARE_FILE = n
+ DISABLE_PM_SUPPORT = n
+ DISABLE_MULTI_MSIX_VECTOR = n
+
++# develop
++ccflags-y += -Wno-implicit-fallthrough
++
+ ifneq ($(KERNELRELEASE),)
+ 	obj-m := r8125.o
+ 	r8125-objs := r8125_n.o rtl_eeprom.o rtltool.o

@@ -5,7 +5,7 @@
 *.tar.gz
 .DS_Store
 
-openwrt
+openwrt*
 out
 
 build-x86_64.bash

@@ -75,7 +75,8 @@ geoip:private
 208.64.202.0/24
 208.64.203.0/24
 208.78.164.0/22'
-	option domain_list 'geosite:alibaba
+	option domain_list 'geosite:cn
+geosite:alibaba
 domain:alicdn.com
 domain:tanx.com
 domain:rantu.com

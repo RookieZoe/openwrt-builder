@@ -15,22 +15,82 @@ GITHUB_WORKSPACE=${GITHUB_WORKSPACE:-$WORK_DIR}
 R_VERSION=$(date +'v%y.%m.%d')
 R_DESCRIPTION="OpenWrt $R_VERSION Build by Rookie_Zoe"
 OPENWRT_SOURCE="https://github.com/Lienol/openwrt.git"
-OPENWRT_BRANCH="22.03"
-PASSWALL_BRANCH="luci-smartdns-new-version"
-
-# case "$BUILD_TARGET" in
-# 'x64-samba4')
-#   OPENWRT_BRANCH="21.02"
-#   PASSWALL_BRANCH="luci"
-#   ;;
-# 'aarch64')
-#   OPENWRT_BRANCH="22.03"
-#   PASSWALL_BRANCH="luci-smartdns-new-version"
-#   ;;
-# esac
+OPENWRT_BRANCH="23.05"
+PASSWALL_BRANCH="luci-smartdns-dev"
 
 PUB_CONF_PATH="$GITHUB_WORKSPACE/public"
 ARCH_CONF_PATH="$GITHUB_WORKSPACE/configs"
+
+r8125_patch() {
+  cp "$GITHUB_WORKSPACE/public/patchs/r8125/200-fix-openwrt-23.05.patch" \
+    "$GITHUB_WORKSPACE/openwrt/package/kernel/r8125/patches/200-fix-openwrt-23.05.patch"
+}
+
+turboacc_patch() {
+  K_VERSION=''
+  case "$OPENWRT_BRANCH" in
+  '22.03')
+    K_VERSION="5.10"
+    ;;
+  '23.05')
+    K_VERSION="5.15"
+    ;;
+  'master')
+    K_VERSION="6.1"
+    ;;
+  esac
+
+  # if K_VERSION is not empty, then patch turboacc
+  if [ -n "$K_VERSION" ]; then
+    pushd "$GITHUB_WORKSPACE/openwrt"
+
+    mkdir -p turboacc_tmp ./package/turboacc
+    cd turboacc_tmp
+    git clone https://github.com/chenmozhijin/turboacc -b package
+    cd ../package/turboacc
+    git clone https://github.com/fullcone-nat-nftables/nft-fullcone
+    git clone https://github.com/chenmozhijin/turboacc
+    mv ./turboacc/luci-app-turboacc ./luci-app-turboacc
+    rm -rf ./turboacc
+    cd ../..
+
+    rm ./target/linux/generic/hack-$K_VERSION/952-*.patch
+    if [ "$K_VERSION" = "5.10" ]; then
+      cp -f turboacc_tmp/turboacc/hack-$K_VERSION/952-net-conntrack-events-support-multiple-registrant.patch ./target/linux/generic/hack-$K_VERSION/952-net-conntrack-events-support-multiple-registrant.patch
+      cp -f turboacc_tmp/turboacc/hack-$K_VERSION/953-net-patch-linux-kernel-to-support-shortcut-fe.patch ./target/linux/generic/hack-$K_VERSION/953-net-patch-linux-kernel-to-support-shortcut-fe.patch
+      cp -f turboacc_tmp/turboacc/pending-$K_VERSION/613-netfilter_optional_tcp_window_check.patch ./target/linux/generic/hack-$K_VERSION/613-netfilter_optional_tcp_window_check.patch
+    else
+      cp -f turboacc_tmp/turboacc/hack-$K_VERSION/952-add-net-conntrack-events-support-multiple-registrant.patch ./target/linux/generic/hack-$K_VERSION/952-add-net-conntrack-events-support-multiple-registrant.patch
+      cp -f turboacc_tmp/turboacc/hack-$K_VERSION/953-net-patch-linux-kernel-to-support-shortcut-fe.patch ./target/linux/generic/hack-$K_VERSION/953-net-patch-linux-kernel-to-support-shortcut-fe.patch
+      cp -f turboacc_tmp/turboacc/pending-$K_VERSION/613-netfilter_optional_tcp_window_check.patch ./target/linux/generic/pending-$K_VERSION/613-netfilter_optional_tcp_window_check.patch
+    fi
+
+    rm -rf ./package/libs/libnftnl ./package/network/config/firewall4 ./package/network/utils/nftables
+    mkdir -p ./package/network/config/firewall4 ./package/libs/libnftnl ./package/network/utils/nftables
+    cp -r ./turboacc_tmp/turboacc/shortcut-fe ./package/turboacc
+    cp -RT "./turboacc_tmp/turboacc/firewall4-$(grep -o 'FIREWALL4_VERSION=.*' ./turboacc_tmp/turboacc/version | cut -d '=' -f 2)/firewall4" ./package/network/config/firewall4
+    cp -RT "./turboacc_tmp/turboacc/libnftnl-$(grep -o 'LIBNFTNL_VERSION=.*' ./turboacc_tmp/turboacc/version | cut -d '=' -f 2)/libnftnl" ./package/libs/libnftnl
+    cp -RT "./turboacc_tmp/turboacc/nftables-$(grep -o 'NFTABLES_VERSION=.*' ./turboacc_tmp/turboacc/version | cut -d '=' -f 2)/nftables" ./package/network/utils/nftables
+    rm -rf turboacc_tmp
+    rm -rf ./package/turboacc
+    echo "# CONFIG_NF_CONNTRACK_CHAIN_EVENTS is not set" >>"target/linux/generic/config-$K_VERSION"
+    echo "# CONFIG_SHORTCUT_FE is not set" >>"target/linux/generic/config-$K_VERSION"
+    popd
+  fi
+}
+
+golang_patch() {
+  if [[ "$OPENWRT_BRANCH" == "23.05" ]]; then
+    echo ">>>>>>>>>>>>>>>>> golang_patch"
+
+    pushd "$GITHUB_WORKSPACE/openwrt"
+
+    rm -rf feeds/packages/lang/golang
+    git clone https://github.com/sbwml/packages_lang_golang -b 21.x feeds/packages/lang/golang
+
+    popd
+  fi
+}
 
 prepare_codes_feeds() {
   echo ">>>>>>>>>>>>>>>>> Prepare source codes and feeds"
@@ -38,13 +98,9 @@ prepare_codes_feeds() {
   rm -rf "$GITHUB_WORKSPACE/openwrt"
   git clone -b "$OPENWRT_BRANCH" --single-branch "$OPENWRT_SOURCE" "$GITHUB_WORKSPACE/openwrt"
 
-  # replace luci:21.02 with luci:17.01-dev
-  # echo ">>>>>>>>>>>>>>>>> replace luci:21.02 with luci:17.01-dev"
-  # sed -i -e '/openwrt-luci.git;/d' "$GITHUB_WORKSPACE/openwrt/feeds.conf.default"
   {
     echo ""
-    # echo "src-git luci https://github.com/Lienol/openwrt-luci.git;21.02"
-    echo "src-git diy1 https://github.com/xiaorouji/openwrt-passwall.git;packages"
+    echo "src-git diy1 https://github.com/xiaorouji/openwrt-passwall-packages.git;main"
     echo "src-git diy2 https://github.com/xiaorouji/openwrt-passwall.git;$PASSWALL_BRANCH"
     echo "src-git amlogic https://github.com/ophub/luci-app-amlogic.git;main"
   } >>"$GITHUB_WORKSPACE/openwrt/feeds.conf.default"
@@ -61,6 +117,9 @@ prepare_codes_feeds() {
 
   cd "$GITHUB_WORKSPACE/openwrt/"
 
+  r8125_patch
+  turboacc_patch
+
   # feeds update
   echo ">>>>>>>>>>>>>>>>> feeds update"
   ./scripts/feeds update -a
@@ -71,22 +130,17 @@ prepare_codes_feeds() {
   cp -r feeds/diy1/xray-core feeds/packages/net
 
   # fix luci modal pannel style issue
-  echo ">>>>>>>>>>>>>>>>> fix luci modal pannel style issue"
-  LUCI_HEADER_FILE="$GITHUB_WORKSPACE/openwrt/feeds/luci/modules/luci-base/luasrc/view/header.htm"
-  LUCI_HEADER_STYLE_BEGIN=$(grep <"$LUCI_HEADER_FILE" -n "<style>" | awk -F ":" '{print $1}')
-  LUCI_HEADER_STYLE_END=$(grep <"$LUCI_HEADER_FILE" -n "</style>" | awk -F ":" '{print $1}')
-  sed -i -e "${LUCI_HEADER_STYLE_BEGIN}","${LUCI_HEADER_STYLE_END}"d "$LUCI_HEADER_FILE"
+  # echo ">>>>>>>>>>>>>>>>> fix luci modal pannel style issue"
+  # LUCI_HEADER_FILE="$GITHUB_WORKSPACE/openwrt/feeds/luci/modules/luci-base/luasrc/view/header.htm"
+  # LUCI_HEADER_STYLE_BEGIN=$(grep <"$LUCI_HEADER_FILE" -n "<style>" | awk -F ":" '{print $1}')
+  # LUCI_HEADER_STYLE_END=$(grep <"$LUCI_HEADER_FILE" -n "</style>" | awk -F ":" '{print $1}')
+  # sed -i -e "${LUCI_HEADER_STYLE_BEGIN}","${LUCI_HEADER_STYLE_END}"d "$LUCI_HEADER_FILE"
 
   # fix some luci-theme-bootstrap style issue
   echo ">>>>>>>>>>>>>>>>> fix some luci-theme-bootstrap style issue"
   LUCI_THEME_BOOTSTRAP_FILE="$GITHUB_WORKSPACE/openwrt/feeds/luci/themes/luci-theme-bootstrap/htdocs/luci-static/bootstrap/cascade.css"
   sed -i -e 's/940px/1100px/g' "$LUCI_THEME_BOOTSTRAP_FILE"
   cat "$PUB_CONF_PATH/luci-theme-bootstrap/cascade.css" >>"$LUCI_THEME_BOOTSTRAP_FILE"
-
-  # fix some luci-app-smartdns issue
-  # if [ "$BUILD_TARGET" != "x64-samba4" ]; then
-  #   wget https://github.com/openwrt/luci/raw/openwrt-22.03/applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js -O "$GITHUB_WORKSPACE/openwrt/feeds/luci/applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js"
-  # fi
 
   # make luci-app-ttyd height fit window
   echo ">>>>>>>>>>>>>>>>> make luci-app-ttyd height fit window"
@@ -106,15 +160,18 @@ prepare_codes_feeds() {
   cat "$PUB_CONF_PATH/pw-rules/proxy_host" >"$TARGET_PASSWALL_CONFIG/rules/proxy_host"
   cat "$PUB_CONF_PATH/pw-rules/proxy_ip" >"$TARGET_PASSWALL_CONFIG/rules/proxy_ip"
 
+  golang_patch
+
   # feeds install
   echo ">>>>>>>>>>>>>>>>> feeds install"
+
   ./scripts/feeds install -a
 }
 
 prepare_configs() {
   echo ">>>>>>>>>>>>>>>>> Prepare config"
   cd "$GITHUB_WORKSPACE"
-  git checkout ./
+  # git checkout ./
 
   cd "$GITHUB_WORKSPACE/openwrt/"
   rm -rf "$GITHUB_WORKSPACE/openwrt/bin/targets/"

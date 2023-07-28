@@ -50,7 +50,7 @@ jobs:
           GZIP_IMGS: .gz
           OPENWRT_VER: ${{ env.DISTRO_VERSION }}
           PACKAGE_SOC: s905d
-          OPENWRT_ARMVIRT: out/openwrt-armvirt-64-default-rootfs.tar.gz
+          OPENWRT_ARMVIRT: out/openwrt-armsr-64-default-rootfs.tar.gz
           DISTRIB_REVISION: ${{ env.DISTRO_VERSION }}
           KERNEL_AUTO_LATEST: true
           DISTRIB_DESCRIPTION: OpenWrt ${{ env.DISTRO_VERSION }} Build by Rookie_Zoe
@@ -60,15 +60,17 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v3
         with:
-          name: openwrt-armvirt-64-${{ env.DISTRO_VERSION }}
-          path: ${{ github.workspace }}/out/
+          name: openwrt-armsr-64-${{ env.DISTRO_VERSION }}
+          path: |
+            ${{ github.workspace }}/out/
+            ${{ github.workspace }}/openwrt/bin/targets/
 
       - name: 4-2 Prepare targets [firmware]
         run: |
           tree $PACKAGED_OUTPUTPATH/
           cd $PACKAGED_OUTPUTPATH/
           rm -f ./sha256sum
-          touch ./openwrt-armvirt-64.sha256sum
+          touch ./openwrt-armsr-64.sha256sum
           find ./ -follow -type f -name "openwrt_*.img" -print | while read -r img; do
             gzip "$img"
           done
@@ -79,7 +81,7 @@ jobs:
             mv -f "$file" $PACKAGED_OUTPUTPATH/
           done
           find ./ -follow -type f -name "openwrt_*.gz" -print | while read -r img; do
-            sha256sum "$img" >> ./openwrt-armvirt-64.sha256sum
+            sha256sum "$img" >> ./openwrt-armsr-64.sha256sum
           done
           tree $PACKAGED_OUTPUTPATH/
 
@@ -101,5 +103,5 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v3
         with:
-          name: openwrt-armvirt-64_firmware-${{ env.DISTRO_VERSION }}
+          name: openwrt-armsr-64_firmware-${{ env.DISTRO_VERSION }}
           path: ${{ env.PACKAGED_OUTPUTPATH }}/*

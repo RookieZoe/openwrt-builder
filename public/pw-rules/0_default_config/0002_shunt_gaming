@@ -1,0 +1,5 @@
+
+config shunt_rules 'GAMING'
+	option remarks 'GAMING'
+	option domain_list 'geosite:category-games@!cn
+domain:store.steampowered.com'

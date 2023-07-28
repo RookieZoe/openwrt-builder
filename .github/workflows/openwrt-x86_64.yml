@@ -65,4 +65,6 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: openwrt-x86-64-${{ env.DISTRO_VERSION }}
-          path: ${{ github.workspace }}/out/
+          path: |
+            ${{ github.workspace }}/out/
+            ${{ github.workspace }}/openwrt/bin/targets/

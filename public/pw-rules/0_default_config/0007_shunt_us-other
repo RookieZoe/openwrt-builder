@@ -3,6 +3,7 @@ config shunt_rules 'OTHER_PROXY_US'
 	option remarks '其他代理_US'
 	option domain_list 'geosite:rarbg
 geosite:yandex
+geosite:openai
 
 domain:vmware.com
 domain:mikrotik.com
