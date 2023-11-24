@@ -24,9 +24,9 @@ case "$PACK_TARGET" in
   OP_OUT_TARBALL=openwrt-x86-64-generic_packages_samba4.tar.gz
   ;;
 'aarch64')
-  OP_TARGET_NAME=openwrt-armsr-64-default-rootfs.tar.gz
-  OP_OUT_NAME=openwrt-armsr-64-default-rootfs.tar.gz
-  OP_OUT_TARBALL=openwrt-armsr-64-default_packages.tar.gz
+  OP_TARGET_NAME="openwrt-armsr*rootfs.tar.gz"
+  OP_OUT_NAME=openwrt-armsr-armv8-generic-rootfs.tar.gz
+  OP_OUT_TARBALL=openwrt-armsr-armv8-default_packages.tar.gz
   ;;
 esac
 

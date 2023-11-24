@@ -12,30 +12,23 @@ REBUILD_FLAG=$2
 
 GITHUB_WORKSPACE=${GITHUB_WORKSPACE:-$WORK_DIR}
 
-R_VERSION=$(date +'v%y.%m.%d')
-R_DESCRIPTION="OpenWrt $R_VERSION Build by Rookie_Zoe"
-OPENWRT_SOURCE="https://github.com/Lienol/openwrt.git"
-OPENWRT_BRANCH="23.05"
-PASSWALL_BRANCH="luci-smartdns-dev"
+OPENWRT_SOURCE="https://github.com/openwrt/openwrt.git"
+OPENWRT_BRANCH="openwrt-23.05"
+PASSWALL_BRANCH="branches/luci-smartdns-dev"
 
 PUB_CONF_PATH="$GITHUB_WORKSPACE/public"
 ARCH_CONF_PATH="$GITHUB_WORKSPACE/configs"
 
-r8125_patch() {
-  cp "$GITHUB_WORKSPACE/public/patchs/r8125/200-fix-openwrt-23.05.patch" \
-    "$GITHUB_WORKSPACE/openwrt/package/kernel/r8125/patches/200-fix-openwrt-23.05.patch"
-}
-
 turboacc_patch() {
   K_VERSION=''
   case "$OPENWRT_BRANCH" in
-  '22.03')
+  'openwrt-22.03')
     K_VERSION="5.10"
     ;;
-  '23.05')
+  'openwrt-23.05')
     K_VERSION="5.15"
     ;;
-  'master')
+  'main')
     K_VERSION="6.1"
     ;;
   esac
@@ -45,16 +38,12 @@ turboacc_patch() {
     pushd "$GITHUB_WORKSPACE/openwrt"
 
     mkdir -p turboacc_tmp ./package/turboacc
-    cd turboacc_tmp
-    git clone https://github.com/chenmozhijin/turboacc -b package
-    cd ../package/turboacc
-    git clone https://github.com/fullcone-nat-nftables/nft-fullcone
-    git clone https://github.com/chenmozhijin/turboacc
-    mv ./turboacc/luci-app-turboacc ./luci-app-turboacc
-    rm -rf ./turboacc
-    cd ../..
+    git clone --depth 1 https://github.com/chenmozhijin/turboacc -b package ./turboacc_tmp/turboacc
+    git clone --depth 1 https://github.com/fullcone-nat-nftables/nft-fullcone ./package/turboacc/nft-fullcone
+    git clone --depth 1 https://github.com/chenmozhijin/turboacc -b luci ./package/turboacc/turboacc
+    mv ./package/turboacc/turboacc/luci-app-turboacc ./package/turboacc/luci-app-turboacc
+    rm -rf ./package/turboacc/turboacc
 
-    rm ./target/linux/generic/hack-$K_VERSION/952-*.patch
     if [ "$K_VERSION" = "5.10" ]; then
       cp -f turboacc_tmp/turboacc/hack-$K_VERSION/952-net-conntrack-events-support-multiple-registrant.patch ./target/linux/generic/hack-$K_VERSION/952-net-conntrack-events-support-multiple-registrant.patch
       cp -f turboacc_tmp/turboacc/hack-$K_VERSION/953-net-patch-linux-kernel-to-support-shortcut-fe.patch ./target/linux/generic/hack-$K_VERSION/953-net-patch-linux-kernel-to-support-shortcut-fe.patch
@@ -72,21 +61,8 @@ turboacc_patch() {
     cp -RT "./turboacc_tmp/turboacc/libnftnl-$(grep -o 'LIBNFTNL_VERSION=.*' ./turboacc_tmp/turboacc/version | cut -d '=' -f 2)/libnftnl" ./package/libs/libnftnl
     cp -RT "./turboacc_tmp/turboacc/nftables-$(grep -o 'NFTABLES_VERSION=.*' ./turboacc_tmp/turboacc/version | cut -d '=' -f 2)/nftables" ./package/network/utils/nftables
     rm -rf turboacc_tmp
-    rm -rf ./package/turboacc
     echo "# CONFIG_NF_CONNTRACK_CHAIN_EVENTS is not set" >>"target/linux/generic/config-$K_VERSION"
     echo "# CONFIG_SHORTCUT_FE is not set" >>"target/linux/generic/config-$K_VERSION"
-    popd
-  fi
-}
-
-golang_patch() {
-  if [[ "$OPENWRT_BRANCH" == "23.05" ]]; then
-    echo ">>>>>>>>>>>>>>>>> golang_patch"
-
-    pushd "$GITHUB_WORKSPACE/openwrt"
-
-    rm -rf feeds/packages/lang/golang
-    git clone https://github.com/sbwml/packages_lang_golang -b 21.x feeds/packages/lang/golang
 
     popd
   fi
@@ -96,45 +72,57 @@ prepare_codes_feeds() {
   echo ">>>>>>>>>>>>>>>>> Prepare source codes and feeds"
   # pull openwrt source code
   rm -rf "$GITHUB_WORKSPACE/openwrt"
-  git clone -b "$OPENWRT_BRANCH" --single-branch "$OPENWRT_SOURCE" "$GITHUB_WORKSPACE/openwrt"
-
-  {
-    echo ""
-    echo "src-git diy1 https://github.com/xiaorouji/openwrt-passwall-packages.git;main"
-    echo "src-git diy2 https://github.com/xiaorouji/openwrt-passwall.git;$PASSWALL_BRANCH"
-    echo "src-git amlogic https://github.com/ophub/luci-app-amlogic.git;main"
-  } >>"$GITHUB_WORKSPACE/openwrt/feeds.conf.default"
-
-  # replace release info
-  echo ">>>>>>>>>>>>>>>>> replace release info"
-  {
-    cat "$PUB_CONF_PATH/zzz-default-settings"
-    echo "echo \"BUILD_ID=$R_VERSION\" >> /usr/lib/os-release"
-    echo "echo \"DISTRIB_REVISION='$R_VERSION'\" >> /etc/openwrt_release"
-    echo "echo \"DISTRIB_DESCRIPTION='$R_DESCRIPTION'\" >> /etc/openwrt_release"
-    echo "exit 0"
-  } >"$GITHUB_WORKSPACE/openwrt/package/default-settings/files/zzz-default-settings"
+  git clone --depth 1 "$OPENWRT_SOURCE" -b "$OPENWRT_BRANCH" "$GITHUB_WORKSPACE/openwrt"
 
   cd "$GITHUB_WORKSPACE/openwrt/"
 
-  r8125_patch
   turboacc_patch
 
   # feeds update
   echo ">>>>>>>>>>>>>>>>> feeds update"
   ./scripts/feeds update -a
 
-  # replace feeds/packages/net/xray-core with feeds/diy1/xray-core
-  echo ">>>>>>>>>>>>>>>>> replace feeds/packages/net/xray-core with feeds/diy1/xray-core"
-  rm -rf feeds/packages/net/xray-core
-  cp -r feeds/diy1/xray-core feeds/packages/net
+  mkdir -p package/diy1
 
-  # fix luci modal pannel style issue
-  # echo ">>>>>>>>>>>>>>>>> fix luci modal pannel style issue"
-  # LUCI_HEADER_FILE="$GITHUB_WORKSPACE/openwrt/feeds/luci/modules/luci-base/luasrc/view/header.htm"
-  # LUCI_HEADER_STYLE_BEGIN=$(grep <"$LUCI_HEADER_FILE" -n "<style>" | awk -F ":" '{print $1}')
-  # LUCI_HEADER_STYLE_END=$(grep <"$LUCI_HEADER_FILE" -n "</style>" | awk -F ":" '{print $1}')
-  # sed -i -e "${LUCI_HEADER_STYLE_BEGIN}","${LUCI_HEADER_STYLE_END}"d "$LUCI_HEADER_FILE"
+  echo ">>>>>>>>>>>>>>>>> add extra packages from [github.com/haiibo/openwrt-packages]"
+  svn co https://github.com/haiibo/openwrt-packages/trunk/adguardhome package/diy1/adguardhome
+  svn co https://github.com/haiibo/openwrt-packages/trunk/luci-app-adguardhome package/diy1/luci-app-adguardhome
+  svn co https://github.com/haiibo/openwrt-packages/trunk/luci-app-netdata package/diy1/luci-app-netdata
+
+  echo ">>>>>>>>>>>>>>>>> add extra packages from [github.com/Lienol/openwrt-package]"
+  svn co https://github.com/Lienol/openwrt-package/trunk/luci-app-fileassistant package/diy1/luci-app-fileassistant
+  svn co https://github.com/Lienol/openwrt-package/trunk/luci-app-ramfree package/diy1/luci-app-ramfree
+  svn co https://github.com/Lienol/openwrt-package/branches/other/lean/vlmcsd package/diy1/vlmcsd
+  svn co https://github.com/Lienol/openwrt-package/branches/other/lean/luci-app-arpbind package/diy1/luci-app-arpbind
+  svn co https://github.com/Lienol/openwrt-package/branches/other/lean/luci-app-vlmcsd package/diy1/luci-app-vlmcsd
+  svn co https://github.com/Lienol/openwrt-package/branches/other/lean/luci-app-zerotier package/diy1/luci-app-zerotier
+
+  echo ">>>>>>>>>>>>>>>>> add luci-app-amlogic from [github.com/ophub/luci-app-amlogic]"
+  svn co https://github.com/ophub/luci-app-amlogic/trunk/luci-app-amlogic package/diy1/luci-app-amlogic
+
+  echo ">>>>>>>>>>>>>>>>> add pcat-manager from [https://github.com/photonicat/rockchip_rk3568_openwrt]"
+  svn co https://github.com/photonicat/rockchip_rk3568_openwrt/trunk/package/lean/pcat-manager package/diy1/pcat-manager
+
+  echo ">>>>>>>>>>>>>>>>> add luci-app-passwall from [github.com/xiaorouji/openwrt-passwall]"
+  git clone --depth 1 https://github.com/xiaorouji/openwrt-passwall-packages.git -b main package/diy1/openwrt-passwall
+  svn co "https://github.com/xiaorouji/openwrt-passwall/$PASSWALL_BRANCH/luci-app-passwall" package/diy1/luci-app-passwall
+
+  # set luci-app-passwall rules
+  echo ">>>>>>>>>>>>>>>>> set luci-app-passwall rules"
+  TARGET_PASSWALL_CONFIG="$GITHUB_WORKSPACE/openwrt/package/diy1/luci-app-passwall/root/usr/share/passwall/"
+  cat "$PUB_CONF_PATH/pw-rules/0_default_config/"* >"$TARGET_PASSWALL_CONFIG/0_default_config"
+  cat "$PUB_CONF_PATH/pw-rules/block_host" >"$TARGET_PASSWALL_CONFIG/rules/block_host"
+  cat "$PUB_CONF_PATH/pw-rules/block_ip" >"$TARGET_PASSWALL_CONFIG/rules/block_ip"
+  cat "$PUB_CONF_PATH/pw-rules/direct_host" >"$TARGET_PASSWALL_CONFIG/rules/direct_host"
+  cat "$PUB_CONF_PATH/pw-rules/direct_ip" >"$TARGET_PASSWALL_CONFIG/rules/direct_ip"
+  cat "$PUB_CONF_PATH/pw-rules/lanlist_ipv4" >"$TARGET_PASSWALL_CONFIG/rules/lanlist_ipv4"
+  cat "$PUB_CONF_PATH/pw-rules/lanlist_ipv6" >"$TARGET_PASSWALL_CONFIG/rules/lanlist_ipv6"
+  cat "$PUB_CONF_PATH/pw-rules/proxy_host" >"$TARGET_PASSWALL_CONFIG/rules/proxy_host"
+  cat "$PUB_CONF_PATH/pw-rules/proxy_ip" >"$TARGET_PASSWALL_CONFIG/rules/proxy_ip"
+
+  echo ">>>>>>>>>>>>>>>>> replace feeds/packages/net/xray-core with package/diy1/xray-core"
+  rm -rf feeds/packages/net/xray-core
+  cp -r package/diy1/openwrt-passwall/xray-core feeds/packages/net
 
   # fix some luci-theme-bootstrap style issue
   echo ">>>>>>>>>>>>>>>>> fix some luci-theme-bootstrap style issue"
@@ -147,24 +135,8 @@ prepare_codes_feeds() {
   LUCI_TTYD_TERMJS="$GITHUB_WORKSPACE/openwrt/feeds/luci/applications/luci-app-ttyd/htdocs/luci-static/resources/view/ttyd/term.js"
   sed -i -e 's/500px/calc(100vh - 173px)/g' "$LUCI_TTYD_TERMJS"
 
-  # set luci-app-passwall rules
-  echo ">>>>>>>>>>>>>>>>> set luci-app-passwall rules"
-  TARGET_PASSWALL_CONFIG="$GITHUB_WORKSPACE/openwrt/feeds/diy2/luci-app-passwall/root/usr/share/passwall/"
-  cat "$PUB_CONF_PATH/pw-rules/0_default_config/"* >"$TARGET_PASSWALL_CONFIG/0_default_config"
-  cat "$PUB_CONF_PATH/pw-rules/block_host" >"$TARGET_PASSWALL_CONFIG/rules/block_host"
-  cat "$PUB_CONF_PATH/pw-rules/block_ip" >"$TARGET_PASSWALL_CONFIG/rules/block_ip"
-  cat "$PUB_CONF_PATH/pw-rules/direct_host" >"$TARGET_PASSWALL_CONFIG/rules/direct_host"
-  cat "$PUB_CONF_PATH/pw-rules/direct_ip" >"$TARGET_PASSWALL_CONFIG/rules/direct_ip"
-  cat "$PUB_CONF_PATH/pw-rules/lanlist_ipv4" >"$TARGET_PASSWALL_CONFIG/rules/lanlist_ipv4"
-  cat "$PUB_CONF_PATH/pw-rules/lanlist_ipv6" >"$TARGET_PASSWALL_CONFIG/rules/lanlist_ipv6"
-  cat "$PUB_CONF_PATH/pw-rules/proxy_host" >"$TARGET_PASSWALL_CONFIG/rules/proxy_host"
-  cat "$PUB_CONF_PATH/pw-rules/proxy_ip" >"$TARGET_PASSWALL_CONFIG/rules/proxy_ip"
-
-  golang_patch
-
   # feeds install
   echo ">>>>>>>>>>>>>>>>> feeds install"
-
   ./scripts/feeds install -a
 }
 
