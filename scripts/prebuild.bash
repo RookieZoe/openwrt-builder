@@ -14,7 +14,8 @@ GITHUB_WORKSPACE=${GITHUB_WORKSPACE:-$WORK_DIR}
 
 OPENWRT_SOURCE="https://github.com/openwrt/openwrt.git"
 OPENWRT_BRANCH="openwrt-23.05"
-PASSWALL_BRANCH="branches/luci-smartdns-dev"
+PASSWALL_BRANCH="luci-smartdns-dev"
+DIY_PACKAGE_PATH="$GITHUB_WORKSPACE/openwrt/package/diy1"
 
 PUB_CONF_PATH="$GITHUB_WORKSPACE/public"
 ARCH_CONF_PATH="$GITHUB_WORKSPACE/configs"
@@ -82,30 +83,42 @@ prepare_codes_feeds() {
   echo ">>>>>>>>>>>>>>>>> feeds update"
   ./scripts/feeds update -a
 
-  mkdir -p package/diy1
+  mkdir -p "$DIY_PACKAGE_PATH"
 
   echo ">>>>>>>>>>>>>>>>> add extra packages from [github.com/haiibo/openwrt-packages]"
-  svn co https://github.com/haiibo/openwrt-packages/trunk/adguardhome package/diy1/adguardhome
-  svn co https://github.com/haiibo/openwrt-packages/trunk/luci-app-adguardhome package/diy1/luci-app-adguardhome
-  svn co https://github.com/haiibo/openwrt-packages/trunk/luci-app-netdata package/diy1/luci-app-netdata
+  git clone --depth 1 https://github.com/haiibo/openwrt-packages.git -b master "$DIY_PACKAGE_PATH/haiibo-package_tmp"
+  mv "$DIY_PACKAGE_PATH/haiibo-package_tmp/adguardhome" "$DIY_PACKAGE_PATH"
+  mv "$DIY_PACKAGE_PATH/haiibo-package_tmp/luci-app-adguardhome" "$DIY_PACKAGE_PATH"
+  mv "$DIY_PACKAGE_PATH/haiibo-package_tmp/luci-app-netdata" "$DIY_PACKAGE_PATH"
+  rm -rf "$DIY_PACKAGE_PATH/haiibo-package_tmp"
 
   echo ">>>>>>>>>>>>>>>>> add extra packages from [github.com/Lienol/openwrt-package]"
-  svn co https://github.com/Lienol/openwrt-package/trunk/luci-app-fileassistant package/diy1/luci-app-fileassistant
-  svn co https://github.com/Lienol/openwrt-package/trunk/luci-app-ramfree package/diy1/luci-app-ramfree
-  svn co https://github.com/Lienol/openwrt-package/branches/other/lean/vlmcsd package/diy1/vlmcsd
-  svn co https://github.com/Lienol/openwrt-package/branches/other/lean/luci-app-arpbind package/diy1/luci-app-arpbind
-  svn co https://github.com/Lienol/openwrt-package/branches/other/lean/luci-app-vlmcsd package/diy1/luci-app-vlmcsd
-  svn co https://github.com/Lienol/openwrt-package/branches/other/lean/luci-app-zerotier package/diy1/luci-app-zerotier
+  git clone --depth 1 https://github.com/Lienol/openwrt-package.git -b main "$DIY_PACKAGE_PATH/lienol-package_main"
+  mv "$DIY_PACKAGE_PATH/lienol-package_main/luci-app-fileassistant" "$DIY_PACKAGE_PATH"
+  mv "$DIY_PACKAGE_PATH/lienol-package_main/luci-app-ramfree" "$DIY_PACKAGE_PATH"
+  git clone --depth 1 https://github.com/Lienol/openwrt-package.git -b other "$DIY_PACKAGE_PATH/lienol-package_other"
+  mv "$DIY_PACKAGE_PATH/lienol-package_other/lean/vlmcsd" "$DIY_PACKAGE_PATH"
+  mv "$DIY_PACKAGE_PATH/lienol-package_other/lean/luci-app-arpbind" "$DIY_PACKAGE_PATH"
+  mv "$DIY_PACKAGE_PATH/lienol-package_other/lean/luci-app-vlmcsd" "$DIY_PACKAGE_PATH"
+  mv "$DIY_PACKAGE_PATH/lienol-package_other/lean/luci-app-zerotier" "$DIY_PACKAGE_PATH"
+  rm -rf "$DIY_PACKAGE_PATH/lienol-package_main"
+  rm -rf "$DIY_PACKAGE_PATH/lienol-package_other"
 
   echo ">>>>>>>>>>>>>>>>> add luci-app-amlogic from [github.com/ophub/luci-app-amlogic]"
-  svn co https://github.com/ophub/luci-app-amlogic/trunk/luci-app-amlogic package/diy1/luci-app-amlogic
+  git clone --depth 1 https://github.com/ophub/luci-app-amlogic.git -b main "$DIY_PACKAGE_PATH/amlogic_tmp"
+  mv "$DIY_PACKAGE_PATH/amlogic_tmp/luci-app-amlogic" "$DIY_PACKAGE_PATH"
+  rm -rf "$DIY_PACKAGE_PATH/amlogic_tmp"
 
   echo ">>>>>>>>>>>>>>>>> add pcat-manager from [https://github.com/photonicat/rockchip_rk3568_openwrt]"
-  svn co https://github.com/photonicat/rockchip_rk3568_openwrt/trunk/package/lean/pcat-manager package/diy1/pcat-manager
+  git clone --depth 1 https://github.com/photonicat/rockchip_rk3568_openwrt.git -b master "$DIY_PACKAGE_PATH/pcat-manager_tmp"
+  mv "$DIY_PACKAGE_PATH/pcat-manager_tmp/package/lean/pcat-manager" "$DIY_PACKAGE_PATH"
+  rm -rf "$DIY_PACKAGE_PATH/pcat-manager_tmp"
 
   echo ">>>>>>>>>>>>>>>>> add luci-app-passwall from [github.com/xiaorouji/openwrt-passwall]"
-  git clone --depth 1 https://github.com/xiaorouji/openwrt-passwall-packages.git -b main package/diy1/openwrt-passwall
-  svn co "https://github.com/xiaorouji/openwrt-passwall/$PASSWALL_BRANCH/luci-app-passwall" package/diy1/luci-app-passwall
+  git clone --depth 1 https://github.com/xiaorouji/openwrt-passwall-packages.git -b main "$DIY_PACKAGE_PATH/openwrt-passwall"
+  git clone --depth 1 https://github.com/xiaorouji/openwrt-passwall.git -b "$PASSWALL_BRANCH" "$DIY_PACKAGE_PATH/passwall_tmp"
+  mv "$DIY_PACKAGE_PATH/passwall_tmp/luci-app-passwall" "$DIY_PACKAGE_PATH"
+  rm -rf "$DIY_PACKAGE_PATH/passwall_tmp"
 
   # set luci-app-passwall rules
   echo ">>>>>>>>>>>>>>>>> set luci-app-passwall rules"
