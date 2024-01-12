@@ -42,7 +42,7 @@ turboacc_patch() {
     git clone --depth 1 https://github.com/chenmozhijin/turboacc -b package ./turboacc_tmp/turboacc
     git clone --depth 1 https://github.com/fullcone-nat-nftables/nft-fullcone ./package/turboacc/nft-fullcone
     git clone --depth 1 https://github.com/chenmozhijin/turboacc -b luci ./package/turboacc/turboacc
-    mv ./package/turboacc/turboacc/luci-app-turboacc ./package/turboacc/luci-app-turboacc
+    [ -e ./package/turboacc/turboacc/luci-app-turboacc ] && mv ./package/turboacc/turboacc/luci-app-turboacc ./package/turboacc/luci-app-turboacc
     rm -rf ./package/turboacc/turboacc
 
     if [ "$K_VERSION" = "5.10" ]; then
@@ -87,37 +87,37 @@ prepare_codes_feeds() {
 
   echo ">>>>>>>>>>>>>>>>> add extra packages from [github.com/haiibo/openwrt-packages]"
   git clone --depth 1 https://github.com/haiibo/openwrt-packages.git -b master "$DIY_PACKAGE_PATH/haiibo-package_tmp"
-  mv "$DIY_PACKAGE_PATH/haiibo-package_tmp/adguardhome" "$DIY_PACKAGE_PATH"
-  mv "$DIY_PACKAGE_PATH/haiibo-package_tmp/luci-app-adguardhome" "$DIY_PACKAGE_PATH"
-  mv "$DIY_PACKAGE_PATH/haiibo-package_tmp/luci-app-netdata" "$DIY_PACKAGE_PATH"
+  [ -e "$DIY_PACKAGE_PATH/haiibo-package_tmp/adguardhome" ] && mv "$DIY_PACKAGE_PATH/haiibo-package_tmp/adguardhome" "$DIY_PACKAGE_PATH"
+  [ -e "$DIY_PACKAGE_PATH/haiibo-package_tmp/luci-app-adguardhome" ] && mv "$DIY_PACKAGE_PATH/haiibo-package_tmp/luci-app-adguardhome" "$DIY_PACKAGE_PATH"
+  [ -e "$DIY_PACKAGE_PATH/haiibo-package_tmp/luci-app-netdata" ] && mv "$DIY_PACKAGE_PATH/haiibo-package_tmp/luci-app-netdata" "$DIY_PACKAGE_PATH"
   rm -rf "$DIY_PACKAGE_PATH/haiibo-package_tmp"
 
   echo ">>>>>>>>>>>>>>>>> add extra packages from [github.com/Lienol/openwrt-package]"
   git clone --depth 1 https://github.com/Lienol/openwrt-package.git -b main "$DIY_PACKAGE_PATH/lienol-package_main"
-  mv "$DIY_PACKAGE_PATH/lienol-package_main/luci-app-fileassistant" "$DIY_PACKAGE_PATH"
-  mv "$DIY_PACKAGE_PATH/lienol-package_main/luci-app-ramfree" "$DIY_PACKAGE_PATH"
+  [ -e "$DIY_PACKAGE_PATH/lienol-package_main/luci-app-fileassistant" ] && mv "$DIY_PACKAGE_PATH/lienol-package_main/luci-app-fileassistant" "$DIY_PACKAGE_PATH"
+  [ -e "$DIY_PACKAGE_PATH/lienol-package_main/luci-app-ramfree" ] && mv "$DIY_PACKAGE_PATH/lienol-package_main/luci-app-ramfree" "$DIY_PACKAGE_PATH"
   git clone --depth 1 https://github.com/Lienol/openwrt-package.git -b other "$DIY_PACKAGE_PATH/lienol-package_other"
-  mv "$DIY_PACKAGE_PATH/lienol-package_other/lean/vlmcsd" "$DIY_PACKAGE_PATH"
-  mv "$DIY_PACKAGE_PATH/lienol-package_other/lean/luci-app-arpbind" "$DIY_PACKAGE_PATH"
-  mv "$DIY_PACKAGE_PATH/lienol-package_other/lean/luci-app-vlmcsd" "$DIY_PACKAGE_PATH"
-  mv "$DIY_PACKAGE_PATH/lienol-package_other/lean/luci-app-zerotier" "$DIY_PACKAGE_PATH"
+  [ -e "$DIY_PACKAGE_PATH/lienol-package_other/lean/vlmcsd" ] && mv "$DIY_PACKAGE_PATH/lienol-package_other/lean/vlmcsd" "$DIY_PACKAGE_PATH"
+  [ -e "$DIY_PACKAGE_PATH/lienol-package_other/lean/luci-app-arpbind" ] && mv "$DIY_PACKAGE_PATH/lienol-package_other/lean/luci-app-arpbind" "$DIY_PACKAGE_PATH"
+  [ -e "$DIY_PACKAGE_PATH/lienol-package_other/lean/luci-app-vlmcsd" ] && mv "$DIY_PACKAGE_PATH/lienol-package_other/lean/luci-app-vlmcsd" "$DIY_PACKAGE_PATH"
+  [ -e "$DIY_PACKAGE_PATH/lienol-package_other/lean/luci-app-zerotier" ] && mv "$DIY_PACKAGE_PATH/lienol-package_other/lean/luci-app-zerotier" "$DIY_PACKAGE_PATH"
   rm -rf "$DIY_PACKAGE_PATH/lienol-package_main"
   rm -rf "$DIY_PACKAGE_PATH/lienol-package_other"
 
   echo ">>>>>>>>>>>>>>>>> add luci-app-amlogic from [github.com/ophub/luci-app-amlogic]"
   git clone --depth 1 https://github.com/ophub/luci-app-amlogic.git -b main "$DIY_PACKAGE_PATH/amlogic_tmp"
-  mv "$DIY_PACKAGE_PATH/amlogic_tmp/luci-app-amlogic" "$DIY_PACKAGE_PATH"
+  [ -e "$DIY_PACKAGE_PATH/amlogic_tmp/luci-app-amlogic" ] && mv "$DIY_PACKAGE_PATH/amlogic_tmp/luci-app-amlogic" "$DIY_PACKAGE_PATH"
   rm -rf "$DIY_PACKAGE_PATH/amlogic_tmp"
 
   echo ">>>>>>>>>>>>>>>>> add pcat-manager from [https://github.com/photonicat/rockchip_rk3568_openwrt]"
   git clone --depth 1 https://github.com/photonicat/rockchip_rk3568_openwrt.git -b master "$DIY_PACKAGE_PATH/pcat-manager_tmp"
-  mv "$DIY_PACKAGE_PATH/pcat-manager_tmp/package/lean/pcat-manager" "$DIY_PACKAGE_PATH"
+  [ -e "$DIY_PACKAGE_PATH/pcat-manager_tmp/package/lean/pcat-manager" ] && mv "$DIY_PACKAGE_PATH/pcat-manager_tmp/package/lean/pcat-manager" "$DIY_PACKAGE_PATH"
   rm -rf "$DIY_PACKAGE_PATH/pcat-manager_tmp"
 
   echo ">>>>>>>>>>>>>>>>> add luci-app-passwall from [github.com/xiaorouji/openwrt-passwall]"
   git clone --depth 1 https://github.com/xiaorouji/openwrt-passwall-packages.git -b main "$DIY_PACKAGE_PATH/openwrt-passwall"
   git clone --depth 1 https://github.com/xiaorouji/openwrt-passwall.git -b "$PASSWALL_BRANCH" "$DIY_PACKAGE_PATH/passwall_tmp"
-  mv "$DIY_PACKAGE_PATH/passwall_tmp/luci-app-passwall" "$DIY_PACKAGE_PATH"
+  [ -e "$DIY_PACKAGE_PATH/passwall_tmp/luci-app-passwall" ] && mv "$DIY_PACKAGE_PATH/passwall_tmp/luci-app-passwall" "$DIY_PACKAGE_PATH"
   rm -rf "$DIY_PACKAGE_PATH/passwall_tmp"
 
   # set luci-app-passwall rules
