@@ -15,6 +15,16 @@ jobs:
     runs-on: ubuntu-20.04
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || github.event.action == 'run-build-op-aarch64'
     steps:
+      - name: Maximize build space
+        uses: easimon/maximize-build-space@master
+        with:
+          root-reserve-mb: 2048
+          remove-codeql: 'true'
+          remove-dotnet: 'true'
+          remove-android: 'true'
+          remove-haskell: 'true'
+          remove-docker-images: 'true'
+
       - uses: actions/checkout@v2
 
       - name: Workspace init
@@ -42,48 +52,48 @@ jobs:
           bash $GITHUB_WORKSPACE/scripts/packup.bash $BUILD_TARGET
           tree $GITHUB_WORKSPACE/out/
 
-      - name: 3 Package firmware [firmware]
-        if: success()
-        uses: unifreq/openwrt_packit@master
-        env:
-          WHOAMI: Rookie_Zoe
-          GZIP_IMGS: .gz
-          OPENWRT_VER: ${{ env.DISTRO_VERSION }}
-          PACKAGE_SOC: s905d_photonicat_qemu
-          OPENWRT_ARMVIRT: out/openwrt-armsr-armv8-generic-rootfs.tar.gz
-          DISTRIB_REVISION: ${{ env.DISTRO_VERSION }}
-          KERNEL_AUTO_LATEST: true
-          DISTRIB_DESCRIPTION: OpenWrt ${{ env.DISTRO_VERSION }} Build by Rookie_Zoe
-          KERNEL_VERSION_NAME: 6.1.63
+      # - name: 3 Package firmware [firmware]
+      #   if: success()
+      #   uses: unifreq/openwrt_packit@master
+      #   env:
+      #     WHOAMI: Rookie_Zoe
+      #     GZIP_IMGS: .gz
+      #     OPENWRT_VER: ${{ env.DISTRO_VERSION }}
+      #     PACKAGE_SOC: s905d_photonicat_qemu
+      #     OPENWRT_ARMVIRT: out/openwrt-armsr-armv8-generic-rootfs.tar.gz
+      #     DISTRIB_REVISION: ${{ env.DISTRO_VERSION }}
+      #     KERNEL_AUTO_LATEST: true
+      #     DISTRIB_DESCRIPTION: OpenWrt ${{ env.DISTRO_VERSION }} Build by Rookie_Zoe
+      #     KERNEL_VERSION_NAME: 6.1.63
 
-      - name: 4-1 Upload targets [aarch64]
-        if: failure()
-        uses: actions/upload-artifact@v3
-        with:
-          name: openwrt-armsr-armv8-${{ env.DISTRO_VERSION }}
-          path: |
-            ${{ github.workspace }}/out/
-            ${{ github.workspace }}/openwrt/bin/targets/
+      # - name: 4-1 Upload targets [aarch64]
+      #   if: failure()
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: openwrt-armsr-armv8-${{ env.DISTRO_VERSION }}
+      #     path: |
+      #       ${{ github.workspace }}/out/
+      #       ${{ github.workspace }}/openwrt/bin/targets/
 
-      - name: 4-2 Prepare targets [firmware]
-        run: |
-          tree $PACKAGED_OUTPUTPATH/
-          cd $PACKAGED_OUTPUTPATH/
-          rm -f ./sha256sum
-          touch ./openwrt-armsr-armv8.sha256sum
-          find ./ -follow -type f -name "openwrt_*.img" -print | while read -r img; do
-            gzip "$img"
-          done
-          find ./ -follow -type f -name "openwrt_*.qcow2" -print | while read -r img; do
-            gzip "$img"
-          done
-          find $GITHUB_WORKSPACE/out/ -follow -type f -name "*packages*.tar.gz" -print | while read -r file; do
-            mv -f "$file" $PACKAGED_OUTPUTPATH/
-          done
-          find ./ -follow -type f -name "openwrt_*.gz" -print | while read -r img; do
-            sha256sum "$img" >> ./openwrt-armsr-armv8.sha256sum
-          done
-          tree $PACKAGED_OUTPUTPATH/
+      # - name: 4-2 Prepare targets [firmware]
+      #   run: |
+      #     tree $PACKAGED_OUTPUTPATH/
+      #     cd $PACKAGED_OUTPUTPATH/
+      #     rm -f ./sha256sum
+      #     touch ./openwrt-armsr-armv8.sha256sum
+      #     find ./ -follow -type f -name "openwrt_*.img" -print | while read -r img; do
+      #       gzip "$img"
+      #     done
+      #     find ./ -follow -type f -name "openwrt_*.qcow2" -print | while read -r img; do
+      #       gzip "$img"
+      #     done
+      #     find $GITHUB_WORKSPACE/out/ -follow -type f -name "*packages*.tar.gz" -print | while read -r file; do
+      #       mv -f "$file" $PACKAGED_OUTPUTPATH/
+      #     done
+      #     find ./ -follow -type f -name "openwrt_*.gz" -print | while read -r img; do
+      #       sha256sum "$img" >> ./openwrt-armsr-armv8.sha256sum
+      #     done
+      #     tree $PACKAGED_OUTPUTPATH/
 
       - name: 5-1 Upload firmware to release
         if: success()
@@ -95,7 +105,7 @@ jobs:
             Auto released by actions
             Now is ${{ env.DISTRO_VERSION }}
           token: ${{ secrets.GITHUB_TOKEN }}
-          artifacts: ${{ env.PACKAGED_OUTPUTPATH }}/*
+          artifacts: ${{ env.GITHUB_WORKSPACE }}/out/*
           allowUpdates: true
           replacesArtifacts: true
 
@@ -104,4 +114,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: openwrt-armsr-armv8_firmware-${{ env.DISTRO_VERSION }}
-          path: ${{ env.PACKAGED_OUTPUTPATH }}/*
+          path: ${{ github.workspace }}/openwrt/bin/targets/*

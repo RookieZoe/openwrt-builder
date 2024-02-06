@@ -15,6 +15,16 @@ jobs:
     runs-on: ubuntu-20.04
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     steps:
+      - name: Maximize build space
+        uses: easimon/maximize-build-space@master
+        with:
+          root-reserve-mb: 2048
+          remove-codeql: 'true'
+          remove-dotnet: 'true'
+          remove-android: 'true'
+          remove-haskell: 'true'
+          remove-docker-images: 'true'
+
       - uses: actions/checkout@v2
 
       - name: Workspace init
