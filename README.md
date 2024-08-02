@@ -1,4 +1,12 @@
-# openwrt-builder
+# ARCHIVED
+
+This repo is no longer maintained.
+
+If you don't want to build it yourself, please use [immortalwrt](https://github.com/immortalwrt/immortalwrt) instead.
+
+---
+
+## openwrt-builder
 
 build custom openwrt with github actions
 
